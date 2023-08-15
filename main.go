@@ -5,9 +5,14 @@ import (
 
 	"github.com/aifuxi/aifuxi_cool_api/models"
 	"github.com/aifuxi/aifuxi_cool_api/routers"
+	"github.com/aifuxi/aifuxi_cool_api/zlog"
 )
 
 func main() {
+	zlog.Setup()
+
+	defer zlog.L.Sync()
+
 	err := models.Setup()
 
 	if err != nil {
