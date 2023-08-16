@@ -12,7 +12,15 @@ type MySQLSettings struct {
 	DBName   string `mapstructure:"dbname"`
 }
 
+type LogSettings struct {
+	Filename   string `mapstructure:"filename"`
+	MaxSize    int    `mapstructure:"max_size"`
+	MaxBackups int    `mapstructure:"max_backups"`
+	MaxAge     int    `mapstructure:"max_age"`
+}
+
 var MySQLConfig MySQLSettings
+var LogConfig LogSettings
 
 func Init() (err error) {
 	viper.SetConfigFile("./configs/dev.toml")
@@ -24,6 +32,12 @@ func Init() (err error) {
 
 	mysqlCfg := viper.Sub("mysql")
 	err = mysqlCfg.Unmarshal(&MySQLConfig)
+	if err != nil {
+		return err
+	}
+
+	logCfg := viper.Sub("log")
+	err = logCfg.Unmarshal(&LogConfig)
 	if err != nil {
 		return err
 	}

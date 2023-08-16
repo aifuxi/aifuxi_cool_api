@@ -1,10 +1,7 @@
 package routers
 
 import (
-	"log"
-
 	"github.com/aifuxi/aifuxi_cool_api/models"
-	"github.com/aifuxi/aifuxi_cool_api/zlog"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -21,11 +18,7 @@ func Setup() *gin.Engine {
 		var tags []models.Tag
 		models.DB.Model(models.Tag{}).Find(&tags)
 
-		log.Println(
-			"get tags嘻嘻 ✔✔")
-		zlog.L.Info("嘻嘻嘻",
-			zap.String("reason", "这是测试日志"),
-		)
+		zap.L().Debug("test global zap logger", zap.String("msg", "test zap"))
 
 		c.JSON(200, gin.H{
 			"data": tags,

@@ -26,6 +26,8 @@ go.work
 tmp
 
 # runtime
-*.log
 
-# 
+
+# log
+logs
+*.log

@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
+	"github.com/aifuxi/aifuxi_cool_api/logger"
 	"github.com/aifuxi/aifuxi_cool_api/models"
 	"github.com/aifuxi/aifuxi_cool_api/routers"
 	"github.com/aifuxi/aifuxi_cool_api/settings"
-	"github.com/aifuxi/aifuxi_cool_api/zlog"
 )
 
 var err error
@@ -17,9 +17,7 @@ func main() {
 		log.Fatalf("初始化配置失败: %v", err)
 	}
 
-	zlog.Setup()
-
-	defer zlog.L.Sync()
+	logger.Init()
 
 	err = models.Setup()
 	if err != nil {
