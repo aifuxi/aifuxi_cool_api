@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"github.com/aifuxi/aifuxi_cool_api/middleware"
 	"github.com/aifuxi/aifuxi_cool_api/models"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -9,7 +10,7 @@ import (
 func Setup() *gin.Engine {
 	r := gin.New()
 
-	r.Use(gin.Recovery(), gin.Logger())
+	r.Use(middleware.GinLogger(), middleware.GinRecovery(true))
 
 	// adminPublicGroup := r.Group("/admin/api/public")
 	adminAuthGroup := r.Group("/admin/api/auth")
