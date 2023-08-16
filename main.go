@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/aifuxi/aifuxi_cool_api/logger"
@@ -25,5 +26,7 @@ func main() {
 	}
 
 	r := routers.Setup()
-	r.Run("localhost:9003")
+
+	addr := fmt.Sprintf("localhost:%d", settings.AppConfig.Port)
+	r.Run(addr)
 }

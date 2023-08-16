@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"os"
+
 	"github.com/aifuxi/aifuxi_cool_api/settings"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -23,9 +25,14 @@ func getEncoder() zapcore.Encoder {
 	encoderConfig := zap.NewProductionEncoderConfig()
 	encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	encoderConfig.TimeKey = "time"
-	encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	encoderConfig.EncodeDuration = zapcore.SecondsDurationEncoder
 	encoderConfig.EncodeCaller = zapcore.ShortCallerEncoder
+
+	if settings.AppConfig.Mode == "debug" {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		return zapcore.NewConsoleEncoder(encoderConfig)
+	}
 
 	return zapcore.NewJSONEncoder(encoderConfig)
 }
@@ -36,6 +43,10 @@ func getLogWriter() zapcore.WriteSyncer {
 		MaxSize:    settings.LogConfig.MaxSize,
 		MaxBackups: settings.LogConfig.MaxBackups,
 		MaxAge:     settings.LogConfig.MaxAge,
+	}
+
+	if settings.AppConfig.Mode == "debug" {
+		return zapcore.AddSync(os.Stdout)
 	}
 
 	return zapcore.AddSync(lumberjackLogger)

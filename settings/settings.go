@@ -4,7 +4,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-type MySQLSettings struct {
+type appSettings struct {
+	Mode string `mapstructure:"mode"`
+	Port int    `mapstructure:"port"`
+}
+
+type mySQLSettings struct {
 	Host     string `mapstructure:"host"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
@@ -12,20 +17,27 @@ type MySQLSettings struct {
 	DBName   string `mapstructure:"dbname"`
 }
 
-type LogSettings struct {
+type logSettings struct {
 	Filename   string `mapstructure:"filename"`
 	MaxSize    int    `mapstructure:"max_size"`
 	MaxBackups int    `mapstructure:"max_backups"`
 	MaxAge     int    `mapstructure:"max_age"`
 }
 
-var MySQLConfig MySQLSettings
-var LogConfig LogSettings
+var AppConfig appSettings
+var MySQLConfig mySQLSettings
+var LogConfig logSettings
 
 func Init() (err error) {
 	viper.SetConfigFile("./configs/dev.toml")
 
 	err = viper.ReadInConfig() // 查找并读取配置文件
+	if err != nil {
+		return err
+	}
+
+	appCfg := viper.Sub("app")
+	err = appCfg.Unmarshal(&AppConfig)
 	if err != nil {
 		return err
 	}

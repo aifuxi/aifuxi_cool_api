@@ -1,3 +1,8 @@
+[app]
+# 和 Gin 的 Mode对应: debug release test
+mode = "debug"
+port = 9003
+
 [mysql]
 host = "localhost"
 username = "root"
