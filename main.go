@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
 	"github.com/aifuxi/aifuxi_cool_api/logger"
-	"github.com/aifuxi/aifuxi_cool_api/models"
 	"github.com/aifuxi/aifuxi_cool_api/routers"
 	"github.com/aifuxi/aifuxi_cool_api/settings"
 )
@@ -20,12 +20,12 @@ func main() {
 
 	logger.Init()
 
-	err = models.Setup()
+	err = mysql.Init()
 	if err != nil {
 		log.Fatalf("连接 MySQL 失败: %v", err)
 	}
 
-	r := routers.Setup()
+	r := routers.Init()
 
 	addr := fmt.Sprintf("localhost:%d", settings.AppConfig.Port)
 	r.Run(addr)

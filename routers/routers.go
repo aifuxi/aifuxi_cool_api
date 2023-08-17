@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Setup() *gin.Engine {
+func Init() *gin.Engine {
 	r := gin.New()
 
 	gin.SetMode(settings.AppConfig.Mode)

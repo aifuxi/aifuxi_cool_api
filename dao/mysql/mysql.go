@@ -1,4 +1,4 @@
-package models
+package mysql
 
 import (
 	"fmt"
@@ -9,9 +9,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
+var db *gorm.DB
 
-func Setup() error {
+func Init() error {
 	var err error
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -22,7 +22,7 @@ func Setup() error {
 		settings.MySQLConfig.DBName,
 	)
 
-	DB, err = gorm.Open(mysql.New(mysql.Config{
+	db, err = gorm.Open(mysql.New(mysql.Config{
 		DSN: dsn,
 	}), &gorm.Config{})
 
