@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"errors"
 	"time"
 
 	"github.com/aifuxi/aifuxi_cool_api/dto"
@@ -57,7 +56,7 @@ func TagExistsByID(id any) bool {
 
 func CreateTag(data *dto.CreateTagDTO) (*models.Tag, error) {
 	if exists := TagExistsByName(data.Name); exists {
-		return nil, errors.New("文章标签已存在")
+		return nil, ErrorTagExists
 	}
 
 	id, err := internal.GenSnowflakeID()
@@ -71,7 +70,6 @@ func CreateTag(data *dto.CreateTagDTO) (*models.Tag, error) {
 		FriendlyUrl: data.FriendlyUrl,
 	}
 	err = db.Model(&models.Tag{}).Create(tag).Error
-
 	if err != nil {
 		return nil, err
 	}
