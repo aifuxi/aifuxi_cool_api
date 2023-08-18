@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/aifuxi/aifuxi_cool_api/dto"
+	"github.com/aifuxi/aifuxi_cool_api/internal"
 	"github.com/aifuxi/aifuxi_cool_api/models"
 )
 
@@ -59,12 +60,17 @@ func CreateTag(data *dto.CreateTagDTO) (*models.Tag, error) {
 		return nil, errors.New("文章标签已存在")
 	}
 
+	id, err := internal.GenSnowflakeID()
+	if err != nil {
+		return nil, err
+	}
+
 	tag := &models.Tag{
-		ID:          time.Now().Unix(),
+		ID:          id,
 		Name:        data.Name,
 		FriendlyUrl: data.FriendlyUrl,
 	}
-	err := db.Model(&models.Tag{}).Create(tag).Error
+	err = db.Model(&models.Tag{}).Create(tag).Error
 
 	if err != nil {
 		return nil, err
