@@ -17,6 +17,9 @@ func initAdminAuthRouterGroup(r *gin.Engine) {
 	// 根据 ID 获取文章标签
 	adminAuthGroup.GET("/tags/:id", controller.GetTagByID)
 
+	// 根据 ID 更新文章标签
+	adminAuthGroup.PUT("/tags/:id", controller.UpdateTagByID)
+
 	// 根据 ID 删除文章标签
 	adminAuthGroup.DELETE("/tags/:id", controller.DeleteTagByID)
 }

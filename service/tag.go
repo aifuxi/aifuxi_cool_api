@@ -18,6 +18,14 @@ func GetTagByID(id int64) (*models.Tag, error) {
 	return mysql.GetTagByID(id)
 }
 
+func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
+	if !mysql.TagExistsByID(id) {
+		return mysql.ErrorTagNotFound
+	}
+
+	return mysql.UpdateTagByID(id, data)
+}
+
 func DeleteTagByID(id int64) error {
 	return mysql.DeleteTagByID(id)
 }

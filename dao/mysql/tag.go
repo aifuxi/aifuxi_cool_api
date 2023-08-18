@@ -19,7 +19,7 @@ func GetTags() (*[]models.Tag, error) {
 	return tags, nil
 }
 
-func GetTagByID(id any) (*models.Tag, error) {
+func GetTagByID(id int64) (*models.Tag, error) {
 	tag := new(models.Tag)
 	err := db.Where("deleted_at is null").First(&tag, id).Error
 	if err != nil {
@@ -29,7 +29,23 @@ func GetTagByID(id any) (*models.Tag, error) {
 	return tag, nil
 }
 
-func DeleteTagByID(id any) error {
+func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
+	var tag = &models.Tag{
+		ID: id,
+	}
+	err := db.Model(tag).Where("deleted_at is null").Updates(
+		models.Tag{
+			Name:        data.Name,
+			FriendlyUrl: data.FriendlyUrl,
+		}).Limit(1).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func DeleteTagByID(id int64) error {
 	if !TagExistsByID(id) {
 		return ErrorTagNotFound
 	}
@@ -48,7 +64,7 @@ func TagExistsByName(name string) bool {
 	return tag.ID != 0
 }
 
-func TagExistsByID(id any) bool {
+func TagExistsByID(id int64) bool {
 	tag := new(models.Tag)
 	db.Where("deleted_at is null").First(&tag, id)
 	return tag.ID != 0
