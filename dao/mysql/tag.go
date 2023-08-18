@@ -33,11 +33,11 @@ func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
 	var tag = &models.Tag{
 		ID: id,
 	}
-	err := db.Model(tag).Where("deleted_at is null").Updates(
+	err := db.Model(tag).Where("deleted_at is null").Limit(1).Updates(
 		models.Tag{
 			Name:        data.Name,
 			FriendlyUrl: data.FriendlyUrl,
-		}).Limit(1).Error
+		}).Error
 	if err != nil {
 		return err
 	}
