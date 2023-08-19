@@ -44,7 +44,7 @@ func CreateTag(c *gin.Context) {
 	tag, err := service.CreateTag(createTagDTO)
 	if err != nil {
 		zap.L().Error("controller.CreateTag: create tag error", zap.Error(err))
-		ResponseErr(c, ServerError)
+		ResponseErrWithMsg(c, InvalidParams, err.Error())
 		return
 	}
 

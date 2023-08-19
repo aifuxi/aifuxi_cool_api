@@ -44,7 +44,7 @@ func CreateUser(c *gin.Context) {
 	user, err := service.CreateUser(createUserDTO)
 	if err != nil {
 		zap.L().Error("controller.CreateUser: create user error", zap.Error(err))
-		ResponseErr(c, ServerError)
+		ResponseErrWithMsg(c, InvalidParams, err.Error())
 		return
 	}
 
