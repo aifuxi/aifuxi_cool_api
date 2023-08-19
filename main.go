@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
-	"github.com/aifuxi/aifuxi_cool_api/logger"
-	"github.com/aifuxi/aifuxi_cool_api/routers"
-	"github.com/aifuxi/aifuxi_cool_api/settings"
+	"api.aifuxi.cool/dao/mysql"
+	"api.aifuxi.cool/logger"
+	"api.aifuxi.cool/routers"
+	"api.aifuxi.cool/settings"
 )
 
 var err error

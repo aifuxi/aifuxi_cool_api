@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	"github.com/aifuxi/aifuxi_cool_api/models"
+	"api.aifuxi.cool/models"
 )
 
 func Test(t *testing.T) {

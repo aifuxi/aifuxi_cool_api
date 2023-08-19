@@ -3,7 +3,7 @@ package logger
 import (
 	"os"
 
-	"github.com/aifuxi/aifuxi_cool_api/settings"
+	"api.aifuxi.cool/settings"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

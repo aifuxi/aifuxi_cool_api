@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/aifuxi/aifuxi_cool_api/dto"
-	"github.com/aifuxi/aifuxi_cool_api/myerror"
-	"github.com/aifuxi/aifuxi_cool_api/service"
+	"api.aifuxi.cool/dto"
+	"api.aifuxi.cool/myerror"
+	"api.aifuxi.cool/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"

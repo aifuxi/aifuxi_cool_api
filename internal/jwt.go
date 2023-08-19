@@ -3,8 +3,8 @@ package internal
 import (
 	"time"
 
-	"github.com/aifuxi/aifuxi_cool_api/myerror"
-	"github.com/aifuxi/aifuxi_cool_api/settings"
+	"api.aifuxi.cool/myerror"
+	"api.aifuxi.cool/settings"
 	"github.com/golang-jwt/jwt/v5"
 )
 

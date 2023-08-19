@@ -3,8 +3,8 @@ package middleware
 import (
 	"strings"
 
-	"github.com/aifuxi/aifuxi_cool_api/controller"
-	"github.com/aifuxi/aifuxi_cool_api/internal"
+	"api.aifuxi.cool/controller"
+	"api.aifuxi.cool/internal"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

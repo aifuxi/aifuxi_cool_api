@@ -3,7 +3,7 @@ package mysql
 import (
 	"fmt"
 
-	"github.com/aifuxi/aifuxi_cool_api/settings"
+	"api.aifuxi.cool/settings"
 	"gorm.io/driver/mysql"
 
 	"gorm.io/gorm"

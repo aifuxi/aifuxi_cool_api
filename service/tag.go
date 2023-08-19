@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
-	"github.com/aifuxi/aifuxi_cool_api/dto"
-	"github.com/aifuxi/aifuxi_cool_api/models"
-	"github.com/aifuxi/aifuxi_cool_api/myerror"
+	"api.aifuxi.cool/dao/mysql"
+	"api.aifuxi.cool/dto"
+	"api.aifuxi.cool/models"
+	"api.aifuxi.cool/myerror"
 )
 
 func GetTags() (*[]models.Tag, error) {

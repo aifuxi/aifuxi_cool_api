@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
-	"github.com/aifuxi/aifuxi_cool_api/dto"
-	"github.com/aifuxi/aifuxi_cool_api/internal"
-	"github.com/aifuxi/aifuxi_cool_api/models"
-	"github.com/aifuxi/aifuxi_cool_api/myerror"
+	"api.aifuxi.cool/dao/mysql"
+	"api.aifuxi.cool/dto"
+	"api.aifuxi.cool/internal"
+	"api.aifuxi.cool/models"
+	"api.aifuxi.cool/myerror"
 	"golang.org/x/crypto/bcrypt"
 )
 

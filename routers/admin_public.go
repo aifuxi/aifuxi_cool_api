@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/aifuxi/aifuxi_cool_api/controller"
+	"api.aifuxi.cool/controller"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"github.com/aifuxi/aifuxi_cool_api/controller"
-	"github.com/aifuxi/aifuxi_cool_api/middleware"
+	"api.aifuxi.cool/controller"
+	"api.aifuxi.cool/middleware"
 	"github.com/gin-gonic/gin"
 )
 
