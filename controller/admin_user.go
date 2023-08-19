@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
 	"github.com/aifuxi/aifuxi_cool_api/dto"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 	"github.com/aifuxi/aifuxi_cool_api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -130,9 +130,9 @@ func DeleteUserByID(c *gin.Context) {
 
 	err = service.DeleteUserByID(id)
 	if err != nil {
-		if errors.Is(err, mysql.ErrorUserNotFound) {
-			zap.L().Error("controller.DeleteUserByID: user not found", zap.Error(mysql.ErrorUserNotFound))
-			ResponseErrWithMsg(c, InvalidParams, mysql.ErrorUserNotFound)
+		if errors.Is(err, myerror.ErrorUserNotFound) {
+			zap.L().Error("controller.DeleteUserByID: user not found", zap.Error(myerror.ErrorUserNotFound))
+			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorUserNotFound)
 			return
 		}
 

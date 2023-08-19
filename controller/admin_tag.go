@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
 	"github.com/aifuxi/aifuxi_cool_api/dto"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 	"github.com/aifuxi/aifuxi_cool_api/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -130,9 +130,9 @@ func DeleteTagByID(c *gin.Context) {
 
 	err = service.DeleteTagByID(id)
 	if err != nil {
-		if errors.Is(err, mysql.ErrorTagNotFound) {
-			zap.L().Error("controller.DeleteTagByID: tag not found", zap.Error(mysql.ErrorTagNotFound))
-			ResponseErrWithMsg(c, InvalidParams, mysql.ErrorTagNotFound)
+		if errors.Is(err, myerror.ErrorTagNotFound) {
+			zap.L().Error("controller.DeleteTagByID: tag not found", zap.Error(myerror.ErrorTagNotFound))
+			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorTagNotFound)
 			return
 		}
 

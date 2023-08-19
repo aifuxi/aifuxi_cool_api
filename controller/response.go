@@ -11,16 +11,20 @@ type ResponseCode int
 const (
 	Ok = 200_00
 
-	InvalidParams ResponseCode = 400_00
-	InvalidToken  ResponseCode = 400_01
+	InvalidParams    ResponseCode = 400_00
+	NoAuthorized     ResponseCode = 400_01
+	InvalidToken     ResponseCode = 400_09
+	ParseTokenFailed ResponseCode = 400_10
 
 	ServerError ResponseCode = 500_00
 )
 
 var codeMsg = map[ResponseCode]string{
-	InvalidParams: "请求参数错误",
-	InvalidToken:  "token 不合法",
-	ServerError:   "服务器内部错误",
+	InvalidParams:    "request parameter error",
+	NoAuthorized:     "no authorized",
+	InvalidToken:     "invalid token",
+	ParseTokenFailed: "parse token failed",
+	ServerError:      "internal server error",
 }
 
 func (r ResponseCode) Msg() string {

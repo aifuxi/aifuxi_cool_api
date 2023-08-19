@@ -4,6 +4,7 @@ import (
 	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
 	"github.com/aifuxi/aifuxi_cool_api/dto"
 	"github.com/aifuxi/aifuxi_cool_api/models"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -28,7 +29,7 @@ func GetUserByID(id int64) (*models.User, error) {
 
 func UpdateUserByID(id int64, data *dto.UpdateUserDTO) error {
 	if !mysql.UserExistsByID(id) {
-		return mysql.ErrorUserNotFound
+		return myerror.ErrorUserNotFound
 	}
 
 	return mysql.UpdateUserByID(id, data)

@@ -6,6 +6,7 @@ import (
 	"github.com/aifuxi/aifuxi_cool_api/dto"
 	"github.com/aifuxi/aifuxi_cool_api/internal"
 	"github.com/aifuxi/aifuxi_cool_api/models"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 )
 
 func GetUsers() (*[]models.User, error) {
@@ -22,6 +23,16 @@ func GetUsers() (*[]models.User, error) {
 func GetUserByID(id int64) (*models.User, error) {
 	user := new(models.User)
 	err := db.Where("deleted_at is null").First(&user, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func GetUserByEmail(email string) (*models.User, error) {
+	user := new(models.User)
+	err := db.Where("deleted_at is null and email = ?", email).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +58,7 @@ func UpdateUserByID(id int64, data *dto.UpdateUserDTO) error {
 
 func DeleteUserByID(id int64) error {
 	if !UserExistsByID(id) {
-		return ErrorUserNotFound
+		return myerror.ErrorUserNotFound
 	}
 
 	err := db.Model(models.User{}).Where("id = ?", id).Limit(1).Update("deleted_at", time.Now().Local().Format(time.DateTime)).Error
@@ -72,7 +83,7 @@ func UserExistsByID(id int64) bool {
 
 func CreateUser(data *dto.CreateUserDTO) (*models.User, error) {
 	if exists := UserExistsByEmail(data.Email); exists {
-		return nil, ErrorUserExists
+		return nil, myerror.ErrorUserExists
 	}
 
 	id, err := internal.GenSnowflakeID()

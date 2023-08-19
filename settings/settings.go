@@ -5,8 +5,10 @@ import (
 )
 
 type appSettings struct {
-	Mode string `mapstructure:"mode"`
-	Port int    `mapstructure:"port"`
+	Mode           string `mapstructure:"mode"`
+	Port           int    `mapstructure:"port"`
+	JwtSecret      string `mapstructure:"jwt_secret"`
+	JwtExpiredHour int    `mapstructure:"jwt_expired_hour"`
 }
 
 type mySQLSettings struct {

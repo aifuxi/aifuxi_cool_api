@@ -4,6 +4,7 @@ import (
 	"github.com/aifuxi/aifuxi_cool_api/dao/mysql"
 	"github.com/aifuxi/aifuxi_cool_api/dto"
 	"github.com/aifuxi/aifuxi_cool_api/models"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 )
 
 func GetTags() (*[]models.Tag, error) {
@@ -20,7 +21,7 @@ func GetTagByID(id int64) (*models.Tag, error) {
 
 func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
 	if !mysql.TagExistsByID(id) {
-		return mysql.ErrorTagNotFound
+		return myerror.ErrorTagNotFound
 	}
 
 	return mysql.UpdateTagByID(id, data)

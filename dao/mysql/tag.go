@@ -6,6 +6,7 @@ import (
 	"github.com/aifuxi/aifuxi_cool_api/dto"
 	"github.com/aifuxi/aifuxi_cool_api/internal"
 	"github.com/aifuxi/aifuxi_cool_api/models"
+	"github.com/aifuxi/aifuxi_cool_api/myerror"
 )
 
 func GetTags() (*[]models.Tag, error) {
@@ -47,7 +48,7 @@ func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
 
 func DeleteTagByID(id int64) error {
 	if !TagExistsByID(id) {
-		return ErrorTagNotFound
+		return myerror.ErrorTagNotFound
 	}
 
 	err := db.Model(models.Tag{}).Where("id = ?", id).Limit(1).Update("deleted_at", time.Now().Local().Format(time.DateTime)).Error
@@ -72,7 +73,7 @@ func TagExistsByID(id int64) bool {
 
 func CreateTag(data *dto.CreateTagDTO) (*models.Tag, error) {
 	if exists := TagExistsByName(data.Name); exists {
-		return nil, ErrorTagExists
+		return nil, myerror.ErrorTagExists
 	}
 
 	id, err := internal.GenSnowflakeID()
