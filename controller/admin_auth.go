@@ -59,5 +59,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	ResponseOk(c, token)
+	ResponseOk(c, gin.H{
+		"access_token": token,
+	})
 }
