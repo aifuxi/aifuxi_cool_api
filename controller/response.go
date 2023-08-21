@@ -13,6 +13,7 @@ const (
 
 	InvalidParams    ResponseCode = 400_00
 	NoAuthorized     ResponseCode = 400_01
+	TokenExpired     ResponseCode = 400_08
 	InvalidToken     ResponseCode = 400_09
 	ParseTokenFailed ResponseCode = 400_10
 
@@ -22,6 +23,7 @@ const (
 var codeMsg = map[ResponseCode]string{
 	InvalidParams:    "request parameter error",
 	NoAuthorized:     "no authorized",
+	TokenExpired:     "token expired",
 	InvalidToken:     "invalid token",
 	ParseTokenFailed: "parse token failed",
 	ServerError:      "internal server error",

@@ -29,7 +29,6 @@ func GenToken(email string) (string, error) {
 	return token.SignedString([]byte(settings.AppConfig.JwtSecret))
 }
 
-// TODO: 需要处理 token 过期的情况，单独抛出过期错误
 func ParseToken(tokenStr string) (*MyClaims, error) {
 
 	token, err := jwt.ParseWithClaims(tokenStr, &MyClaims{}, func(t *jwt.Token) (interface{}, error) {

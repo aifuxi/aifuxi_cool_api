@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"errors"
 	"strings"
 
 	"api.aifuxi.cool/controller"
 	"api.aifuxi.cool/internal"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/zap"
 )
 
@@ -30,7 +32,13 @@ func JwtAuth() func(c *gin.Context) {
 
 		mc, err := internal.ParseToken(parts[1])
 		if err != nil {
-			zap.L().Debug("走到这，解析出错了")
+
+			if errors.Is(err, jwt.ErrTokenExpired) {
+				controller.ResponseErr(c, controller.TokenExpired)
+				c.Abort()
+				return
+			}
+
 			controller.ResponseErr(c, controller.InvalidToken)
 			c.Abort()
 			return
