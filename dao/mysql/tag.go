@@ -9,15 +9,21 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetTags() (*[]models.Tag, error) {
+func GetTags(data *dto.PaginationDTO) (*[]models.Tag, int64, error) {
 	tags := new([]models.Tag)
+	var total int64
 
-	err := db.Where("deleted_at is null").Find(tags).Error
+	err := db.Where("deleted_at is null").Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
 	if err != nil {
-		return nil, err
+		return nil, total, err
 	}
 
-	return tags, nil
+	err = db.Model(models.Tag{}).Where("deleted_at is null").Count(&total).Error
+	if err != nil {
+		return nil, total, err
+	}
+
+	return tags, total, nil
 }
 
 func GetTagByID(id int64) (*models.Tag, error) {

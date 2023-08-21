@@ -38,10 +38,19 @@ func (r ResponseCode) Msg() string {
 }
 
 func ResponseOk(c *gin.Context, data any) {
-	c.AbortWithStatusJSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"code": Ok,
 		"msg":  "ok",
 		"data": data,
+	})
+}
+
+func ResponseOkWithTotal(c *gin.Context, data any, total int64) {
+	c.JSON(http.StatusOK, gin.H{
+		"code":  Ok,
+		"msg":   "ok",
+		"data":  data,
+		"total": total,
 	})
 }
 

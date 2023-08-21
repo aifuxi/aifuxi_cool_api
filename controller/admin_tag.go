@@ -14,14 +14,31 @@ import (
 )
 
 func GetTags(c *gin.Context) {
-	tags, err := service.GetTags()
+	var paginationDTO dto.PaginationDTO
+
+	// 解析分页参数
+	if err := c.ShouldBindQuery(&paginationDTO); err != nil {
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if ok {
+			zap.L().Error("controller.GetTags: validation params failed", zap.Error(errs))
+			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			return
+		}
+
+		zap.L().Error("controller.GetTags: invalid params", zap.Error(err))
+		ResponseErr(c, InvalidParams)
+		return
+	}
+
+	tags, total, err := service.GetTags(&paginationDTO)
 	if err != nil {
 		zap.L().Error("controller.GetTags: get tags error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
 
-	ResponseOk(c, tags)
+	ResponseOkWithTotal(c, tags, total)
 }
 
 func CreateTag(c *gin.Context) {

@@ -5,6 +5,7 @@ import (
 
 	"api.aifuxi.cool/settings"
 	"gorm.io/driver/mysql"
+	"gorm.io/gorm/logger"
 
 	"gorm.io/gorm"
 )
@@ -24,7 +25,9 @@ func Init() error {
 
 	db, err = gorm.Open(mysql.New(mysql.Config{
 		DSN: dsn,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 
 	return err
 }
