@@ -12,4 +12,5 @@ type UpdateTagDTO struct {
 
 type QueryTagDTO struct {
 	PaginationDTO
+	OrderDTO
 }

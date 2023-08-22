@@ -7,7 +7,7 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetTags(data *dto.PaginationDTO) (*[]models.Tag, int64, error) {
+func GetTags(data *dto.QueryTagDTO) (*[]models.Tag, int64, error) {
 	return mysql.GetTags(data)
 }
 

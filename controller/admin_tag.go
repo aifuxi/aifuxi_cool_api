@@ -14,10 +14,10 @@ import (
 )
 
 func GetTags(c *gin.Context) {
-	var paginationDTO dto.PaginationDTO
+	var queryTagDTO dto.QueryTagDTO
 
 	// 解析分页参数
-	if err := c.ShouldBindQuery(&paginationDTO); err != nil {
+	if err := c.ShouldBindQuery(&queryTagDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
@@ -31,7 +31,7 @@ func GetTags(c *gin.Context) {
 		return
 	}
 
-	tags, total, err := service.GetTags(&paginationDTO)
+	tags, total, err := service.GetTags(&queryTagDTO)
 	if err != nil {
 		zap.L().Error("controller.GetTags: get tags error", zap.Error(err))
 		ResponseErr(c, ServerError)

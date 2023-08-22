@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"fmt"
 	"time"
 
 	"api.aifuxi.cool/dto"
@@ -9,11 +10,12 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetTags(data *dto.PaginationDTO) (*[]models.Tag, int64, error) {
+func GetTags(data *dto.QueryTagDTO) (*[]models.Tag, int64, error) {
 	tags := new([]models.Tag)
 	var total int64
 
-	err := db.Where("deleted_at is null").Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
+	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
+	err := db.Order(order).Where("deleted_at is null").Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
 	if err != nil {
 		return nil, total, err
 	}
