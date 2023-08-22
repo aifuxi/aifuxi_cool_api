@@ -8,8 +8,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUsers() (*[]models.User, error) {
-	return mysql.GetUsers()
+func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
+	return mysql.GetUsers(data)
 }
 
 func CreateUser(data *dto.CreateUserDTO) (*models.User, error) {

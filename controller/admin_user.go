@@ -14,14 +14,31 @@ import (
 )
 
 func GetUsers(c *gin.Context) {
-	users, err := service.GetUsers()
+	var getUsersDTO dto.GetUsersDTO
+
+	// 解析分页参数
+	if err := c.ShouldBindQuery(&getUsersDTO); err != nil {
+		// 获取validator.ValidationErrors类型的errors
+		errs, ok := err.(validator.ValidationErrors)
+		if ok {
+			zap.L().Error("controller.GetUsers: validation params failed", zap.Error(errs))
+			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			return
+		}
+
+		zap.L().Error("controller.GetUsers: invalid params", zap.Error(err))
+		ResponseErr(c, InvalidParams)
+		return
+	}
+
+	users, total, err := service.GetUsers(&getUsersDTO)
 	if err != nil {
 		zap.L().Error("controller.GetUsers: get users error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
 
-	ResponseOk(c, users)
+	ResponseOkWithTotal(c, users, total)
 }
 
 func CreateUser(c *gin.Context) {

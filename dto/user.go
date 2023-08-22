@@ -11,3 +11,11 @@ type UpdateUserDTO struct {
 	Nickname string `json:"nickname"`
 	Password string `json:"password"`
 }
+
+type GetUsersDTO struct {
+	Nickname string `form:"nickname"`
+	Email    string `form:"email"`
+
+	PaginationDTO
+	OrderDTO
+}

@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"fmt"
 	"time"
 
 	"api.aifuxi.cool/dto"
@@ -9,15 +10,47 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetUsers() (*[]models.User, error) {
-	users := new([]models.User)
+func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
 
-	err := db.Where("deleted_at is null").Find(users).Error
-	if err != nil {
-		return nil, err
+	// err := db.Where("deleted_at is null").Find(users).Error
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return users, nil
+	users := new([]models.User)
+	var total int64
+	var nicknameLike, emailLike string
+
+	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
+	if len(data.Nickname) > 0 {
+		nicknameLike = "%" + data.Nickname + "%"
 	}
 
-	return users, nil
+	if len(data.Email) > 0 {
+		emailLike = "%" + data.Email + "%"
+	}
+
+	if len(data.Nickname) == 0 && len(data.Email) == 0 {
+		nicknameLike = "%" + data.Nickname + "%"
+		emailLike = "%" + data.Email + "%"
+	}
+
+	err := db.Order(order).Where("deleted_at is null").Where(
+		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
+	).Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(users).Error
+	if err != nil {
+		return nil, total, err
+	}
+
+	err = db.Model(models.User{}).Where("deleted_at is null").Where(
+		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
+	).Count(&total).Error
+	if err != nil {
+		return nil, total, err
+	}
+
+	return users, total, nil
 }
 
 func GetUserByID(id int64) (*models.User, error) {
