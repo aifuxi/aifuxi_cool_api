@@ -10,7 +10,10 @@ type UpdateTagDTO struct {
 	FriendlyUrl string `json:"friendly_url"`
 }
 
-type QueryTagDTO struct {
+type GetTagsDTO struct {
+	Name        string `form:"name"`
+	FriendlyUrl string `form:"friendly_url"`
+
 	PaginationDTO
 	OrderDTO
 }

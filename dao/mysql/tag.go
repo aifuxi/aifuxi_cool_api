@@ -10,17 +10,35 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetTags(data *dto.QueryTagDTO) (*[]models.Tag, int64, error) {
+func GetTags(data *dto.GetTagsDTO) (*[]models.Tag, int64, error) {
 	tags := new([]models.Tag)
 	var total int64
+	var nameLike, friendlyUrlLike string
 
 	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
-	err := db.Order(order).Where("deleted_at is null").Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
+	if len(data.Name) > 0 {
+		nameLike = "%" + data.Name + "%"
+	}
+
+	if len(data.FriendlyUrl) > 0 {
+		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
+	}
+
+	if len(data.Name) == 0 && len(data.FriendlyUrl) == 0 {
+		nameLike = "%" + data.Name + "%"
+		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
+	}
+
+	err := db.Order(order).Where("deleted_at is null").Where(
+		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
+	).Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
 	if err != nil {
 		return nil, total, err
 	}
 
-	err = db.Model(models.Tag{}).Where("deleted_at is null").Count(&total).Error
+	err = db.Model(models.Tag{}).Where("deleted_at is null").Where(
+		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
+	).Count(&total).Error
 	if err != nil {
 		return nil, total, err
 	}

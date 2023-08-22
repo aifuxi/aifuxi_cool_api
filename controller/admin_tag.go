@@ -14,7 +14,7 @@ import (
 )
 
 func GetTags(c *gin.Context) {
-	var queryTagDTO dto.QueryTagDTO
+	var queryTagDTO dto.GetTagsDTO
 
 	// 解析分页参数
 	if err := c.ShouldBindQuery(&queryTagDTO); err != nil {
