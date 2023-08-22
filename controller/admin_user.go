@@ -41,6 +41,21 @@ func GetUsers(c *gin.Context) {
 	ResponseOkWithTotal(c, users, total)
 }
 
+func GetUserProfile(c *gin.Context) {
+	if email, exists := c.Get("email"); exists {
+		user, err := service.GetUserProfile((email.(string)))
+		if err != nil {
+			zap.L().Error("controller.GetUserProfile: get user profile error", zap.Error(err))
+			ResponseErr(c, ServerError)
+			return
+		}
+
+		ResponseOk(c, user)
+	} else {
+		ResponseErr(c, ServerError)
+	}
+}
+
 func CreateUser(c *gin.Context) {
 	createUserDTO := new(dto.CreateUserDTO)
 

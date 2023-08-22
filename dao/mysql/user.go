@@ -11,13 +11,6 @@ import (
 )
 
 func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
-
-	// err := db.Where("deleted_at is null").Find(users).Error
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return users, nil
 	users := new([]models.User)
 	var total int64
 	var nicknameLike, emailLike string

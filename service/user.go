@@ -12,6 +12,10 @@ func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
 	return mysql.GetUsers(data)
 }
 
+func GetUserProfile(email string) (*models.User, error) {
+	return mysql.GetUserByEmail(email)
+}
+
 func CreateUser(data *dto.CreateUserDTO) (*models.User, error) {
 	// encrypt password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
