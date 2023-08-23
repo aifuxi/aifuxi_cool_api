@@ -18,3 +18,8 @@ var (
 	ErrorInvalidToken     = errors.New("invalid token")
 	ErrorParseTokenFailed = errors.New("failed to parse token")
 )
+
+var (
+	ErrorArticleNotFound = errors.New("article not found")
+	ErrorArticleExists   = errors.New("article already exists")
+)

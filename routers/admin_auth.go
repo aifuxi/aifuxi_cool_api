@@ -27,6 +27,22 @@ func initAdminAuthRouterGroup(r *gin.Engine) {
 	// 根据 ID 删除文章标签
 	adminAuthGroup.DELETE("/tags/:id", controller.DeleteTagByID)
 
+	// ====================== 文章 ======================
+	// 获取文章列表
+	adminAuthGroup.GET("/articles", controller.GetArticles)
+
+	// 创建文章
+	adminAuthGroup.POST("/articles", controller.CreateArticle)
+
+	// 根据 ID 获取文章
+	adminAuthGroup.GET("/articles/:id", controller.GetArticleByID)
+
+	// 根据 ID 更新文章
+	adminAuthGroup.PUT("/articles/:id", controller.UpdateArticleByID)
+
+	// 根据 ID 删除文章
+	adminAuthGroup.DELETE("/articles/:id", controller.DeleteArticleByID)
+
 	// ====================== 用户 ======================
 	// 获取用户列表
 	adminAuthGroup.GET("/users", controller.GetUsers)
