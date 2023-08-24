@@ -29,14 +29,14 @@ func GetArticles(data *dto.GetArticlesDTO) (*[]models.Article, int64, error) {
 		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
 	}
 
-	err := db.Order(order).Where("deleted_at is null").Where(
+	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
 		db.Where("title LIKE ?", titleLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(articles).Error
+	).Find(articles).Error
 	if err != nil {
 		return nil, total, err
 	}
 
-	err = db.Model(models.Article{}).Where("deleted_at is null").Where(
+	err = db.Model(models.Article{}).Scopes(isDeletedRecord).Where(
 		db.Where("title LIKE ?", titleLike).Or("friendly_url LIKE ?", friendlyUrlLike),
 	).Count(&total).Error
 	if err != nil {
@@ -48,7 +48,7 @@ func GetArticles(data *dto.GetArticlesDTO) (*[]models.Article, int64, error) {
 
 func GetArticleByID(id int64) (*models.Article, error) {
 	article := new(models.Article)
-	err := db.Where("deleted_at is null").First(&article, id).Error
+	err := db.Scopes(isDeletedRecord).First(&article, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func UpdateArticleByID(id int64, data *dto.UpdateArticleDTO) error {
 	var article = &models.Article{
 		ID: id,
 	}
-	err := db.Model(article).Where("deleted_at is null").Limit(1).Updates(
+	err := db.Model(article).Scopes(isDeletedRecord).Limit(1).Updates(
 		models.Article{
 			Title:       data.Title,
 			Description: data.Description,
@@ -92,13 +92,13 @@ func DeleteArticleByID(id int64) error {
 
 func ArticleExistsByTitle(title string) bool {
 	article := new(models.Article)
-	db.Where("deleted_at is null and title = ?", title).First(&article)
+	db.Scopes(isDeletedRecord).Where("title = ?", title).First(&article)
 	return article.ID != 0
 }
 
 func ArticleExistsByID(id int64) bool {
 	article := new(models.Article)
-	db.Where("deleted_at is null").First(&article, id)
+	db.Scopes(isDeletedRecord).First(&article, id)
 	return article.ID != 0
 }
 

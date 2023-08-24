@@ -29,14 +29,14 @@ func GetTags(data *dto.GetTagsDTO) (*[]models.Tag, int64, error) {
 		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
 	}
 
-	err := db.Order(order).Where("deleted_at is null").Where(
+	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
 		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(tags).Error
+	).Find(tags).Error
 	if err != nil {
 		return nil, total, err
 	}
 
-	err = db.Model(models.Tag{}).Where("deleted_at is null").Where(
+	err = db.Model(models.Tag{}).Scopes(isDeletedRecord).Where(
 		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
 	).Count(&total).Error
 	if err != nil {
@@ -48,7 +48,7 @@ func GetTags(data *dto.GetTagsDTO) (*[]models.Tag, int64, error) {
 
 func GetTagByID(id int64) (*models.Tag, error) {
 	tag := new(models.Tag)
-	err := db.Where("deleted_at is null").First(&tag, id).Error
+	err := db.Scopes(isDeletedRecord).First(&tag, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
 	var tag = &models.Tag{
 		ID: id,
 	}
-	err := db.Model(tag).Where("deleted_at is null").Limit(1).Updates(
+	err := db.Model(tag).Scopes(isDeletedRecord).Limit(1).Updates(
 		models.Tag{
 			Name:        data.Name,
 			FriendlyUrl: data.FriendlyUrl,
@@ -87,13 +87,13 @@ func DeleteTagByID(id int64) error {
 
 func TagExistsByName(name string) bool {
 	tag := new(models.Tag)
-	db.Where("deleted_at is null and name = ?", name).First(&tag)
+	db.Scopes(isDeletedRecord).Where("name = ?", name).First(&tag)
 	return tag.ID != 0
 }
 
 func TagExistsByID(id int64) bool {
 	tag := new(models.Tag)
-	db.Where("deleted_at is null").First(&tag, id)
+	db.Scopes(isDeletedRecord).First(&tag, id)
 	return tag.ID != 0
 }
 

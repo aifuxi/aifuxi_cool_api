@@ -29,14 +29,14 @@ func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
 		emailLike = "%" + data.Email + "%"
 	}
 
-	err := db.Order(order).Where("deleted_at is null").Where(
+	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
 		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
-	).Offset((data.Page - 1) * data.PageSize).Limit(data.PageSize).Find(users).Error
+	).Find(users).Error
 	if err != nil {
 		return nil, total, err
 	}
 
-	err = db.Model(models.User{}).Where("deleted_at is null").Where(
+	err = db.Model(models.User{}).Scopes(isDeletedRecord).Where(
 		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
 	).Count(&total).Error
 	if err != nil {
@@ -48,7 +48,7 @@ func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
 
 func GetUserByID(id int64) (*models.User, error) {
 	user := new(models.User)
-	err := db.Where("deleted_at is null").First(&user, id).Error
+	err := db.Scopes(isDeletedRecord).First(&user, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func GetUserByID(id int64) (*models.User, error) {
 
 func GetUserByEmail(email string) (*models.User, error) {
 	user := new(models.User)
-	err := db.Where("deleted_at is null and email = ?", email).First(&user).Error
+	err := db.Scopes(isDeletedRecord).Where("email = ?", email).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func UpdateUserByID(id int64, data *dto.UpdateUserDTO) error {
 	var user = &models.User{
 		ID: id,
 	}
-	err := db.Model(user).Where("deleted_at is null").Updates(
+	err := db.Model(user).Scopes(isDeletedRecord).Updates(
 		models.User{
 			Nickname: data.Nickname,
 			Avatar:   data.Avatar,
@@ -98,13 +98,13 @@ func DeleteUserByID(id int64) error {
 
 func UserExistsByEmail(email string) bool {
 	user := new(models.User)
-	db.Where("deleted_at is null and email = ?", email).First(&user)
+	db.Scopes(isDeletedRecord).Where("email = ?", email).First(&user)
 	return user.ID != 0
 }
 
 func UserExistsByID(id int64) bool {
 	user := new(models.User)
-	db.Where("deleted_at is null").First(&user, id)
+	db.Scopes(isDeletedRecord).First(&user, id)
 	return user.ID != 0
 }
 
