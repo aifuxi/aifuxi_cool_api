@@ -26,6 +26,7 @@ go.work
 tmp
 
 # runtime
+uploads/
 
 
 # log
