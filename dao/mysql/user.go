@@ -73,6 +73,7 @@ func UpdateUserByID(id int64, data *dto.UpdateUserDTO) error {
 	err := db.Model(user).Where("deleted_at is null").Updates(
 		models.User{
 			Nickname: data.Nickname,
+			Avatar:   data.Avatar,
 			Password: data.Password,
 		}).Limit(1).Error
 	if err != nil {
@@ -120,6 +121,7 @@ func CreateUser(data *dto.CreateUserDTO) (*models.User, error) {
 	user := &models.User{
 		ID:       id,
 		Nickname: data.Nickname,
+		Avatar:   data.Avatar,
 		Email:    data.Email,
 		Password: data.Password,
 	}

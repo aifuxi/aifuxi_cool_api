@@ -5,6 +5,7 @@ import "time"
 type User struct {
 	ID        int64      `gorm:"column:id;type:bigint;primaryKey" json:"id,string"`
 	Nickname  string     `gorm:"column:nickname;type:varchar" json:"nickname"`
+	Avatar    string     `gorm:"column:avatar;type:varchar" json:"avatar"`
 	Email     string     `gorm:"column:email;type:varchar" json:"email"`
 	Password  string     `gorm:"column:password;type:varchar" json:"-"`
 	CreatedAt time.Time  `gorm:"column:created_at;type:datetime" json:"created_at"`
