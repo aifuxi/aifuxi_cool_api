@@ -61,4 +61,8 @@ func initAdminAuthRouterGroup(r *gin.Engine) {
 
 	// 根据 ID 删除用户
 	adminAuthGroup.DELETE("/users/:id", controller.DeleteUserByID)
+
+	// ====================== 上传文件 ======================
+	// 上传文件
+	adminAuthGroup.POST("/uploads", controller.UploadFile)
 }
