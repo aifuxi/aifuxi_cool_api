@@ -20,17 +20,17 @@ func GetTags(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	tags, total, err := service.GetTags(getTagsDTO)
 	if err != nil {
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -44,17 +44,17 @@ func CreateTag(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	tag, err := service.CreateTag(createTagDTO)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, err.Error())
+		ResponseErr(c, InvalidParams, err.Error())
 		return
 	}
 
@@ -66,18 +66,18 @@ func GetTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
+		ResponseErr(c, InvalidParams, "invalid tag id")
 		return
 	}
 
 	tag, err := service.GetTagByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -89,7 +89,7 @@ func UpdateTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
+		ResponseErr(c, InvalidParams, "invalid tag id")
 		return
 	}
 
@@ -98,22 +98,22 @@ func UpdateTagByID(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	err = service.UpdateTagByID(id, updateTagDTO)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -125,18 +125,18 @@ func DeleteTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
+		ResponseErr(c, InvalidParams, "invalid tag id")
 		return
 	}
 
 	err = service.DeleteTagByID(id)
 	if err != nil {
 		if errors.Is(err, myerror.ErrorTagNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorTagNotFound)
+			ResponseErr(c, InvalidParams, myerror.ErrorTagNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 

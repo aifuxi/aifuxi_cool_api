@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type ResponseCode int
@@ -54,15 +56,19 @@ func ResponseOkWithTotal(c *gin.Context, data any, total int64) {
 	})
 }
 
-func ResponseErr(c *gin.Context, code ResponseCode) {
-	c.JSON(http.StatusOK, gin.H{
-		"code": code,
-		"msg":  code.Msg(),
-		"data": nil,
-	})
-}
+func ResponseErr(c *gin.Context, code ResponseCode, arg any) {
+	msg := code.Msg()
 
-func ResponseErrWithMsg(c *gin.Context, code ResponseCode, msg any) {
+	if msg2, ok := arg.(string); ok {
+		zap.L().Error(c.Request.RequestURI, zap.Error(errors.New(msg2)))
+		msg = msg2
+	}
+
+	if err, ok := arg.(error); ok {
+		zap.L().Error(c.Request.RequestURI, zap.Error(err))
+		msg = err.Error()
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"code": code,
 		"msg":  msg,

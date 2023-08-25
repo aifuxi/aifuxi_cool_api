@@ -20,17 +20,17 @@ func GetArticles(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	articles, total, err := service.GetArticles(getArticlesDTO)
 	if err != nil {
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -44,17 +44,17 @@ func CreateArticle(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	article, err := service.CreateArticle(createArticleDTO)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, err.Error())
+		ResponseErr(c, InvalidParams, err.Error())
 		return
 	}
 
@@ -66,18 +66,18 @@ func GetArticleByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid article id")
+		ResponseErr(c, InvalidParams, "invalid article id")
 		return
 	}
 
 	article, err := service.GetArticleByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -89,7 +89,7 @@ func UpdateArticleByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid article id")
+		ResponseErr(c, InvalidParams, "invalid article id")
 		return
 	}
 
@@ -98,22 +98,22 @@ func UpdateArticleByID(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	err = service.UpdateArticleByID(id, updateArticleDTO)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -125,18 +125,18 @@ func DeleteArticleByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid article id")
+		ResponseErr(c, InvalidParams, "invalid article id")
 		return
 	}
 
 	err = service.DeleteArticleByID(id)
 	if err != nil {
 		if errors.Is(err, myerror.ErrorArticleNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorArticleNotFound)
+			ResponseErr(c, InvalidParams, myerror.ErrorArticleNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 

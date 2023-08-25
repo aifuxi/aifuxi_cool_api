@@ -14,17 +14,17 @@ func SignUp(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	user, err := service.SignUp(signUpDTO)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, err.Error())
+		ResponseErr(c, InvalidParams, err.Error())
 		return
 	}
 
@@ -38,17 +38,17 @@ func SignIn(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	token, err := service.SignIn(signInDto)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, err.Error())
+		ResponseErr(c, InvalidParams, err.Error())
 		return
 	}
 

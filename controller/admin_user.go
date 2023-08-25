@@ -20,17 +20,17 @@ func GetUsers(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	users, total, err := service.GetUsers(getUsersDTO)
 	if err != nil {
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -41,13 +41,13 @@ func GetUserProfile(c *gin.Context) {
 	if email, exists := c.Get("email"); exists {
 		user, err := service.GetUserProfile((email.(string)))
 		if err != nil {
-			ResponseErr(c, ServerError)
+			ResponseErr(c, ServerError, nil)
 			return
 		}
 
 		ResponseOk(c, user)
 	} else {
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 	}
 }
 
@@ -58,17 +58,17 @@ func CreateUser(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	user, err := service.CreateUser(createUserDTO)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, err.Error())
+		ResponseErr(c, InvalidParams, err.Error())
 		return
 	}
 
@@ -80,18 +80,18 @@ func GetUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
+		ResponseErr(c, InvalidParams, "invalid user id")
 		return
 	}
 
 	user, err := service.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -103,7 +103,7 @@ func UpdateUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
+		ResponseErr(c, InvalidParams, "invalid user id")
 		return
 	}
 
@@ -112,22 +112,22 @@ func UpdateUserByID(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			ResponseErrWithMsg(c, InvalidParams, errs.Error())
+			ResponseErr(c, InvalidParams, errs.Error())
 			return
 		}
 
-		ResponseErr(c, InvalidParams)
+		ResponseErr(c, InvalidParams, nil)
 		return
 	}
 
 	err = service.UpdateUserByID(id, updateUserDTO)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
+			ResponseErr(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 
@@ -139,18 +139,18 @@ func DeleteUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
+		ResponseErr(c, InvalidParams, "invalid user id")
 		return
 	}
 
 	err = service.DeleteUserByID(id)
 	if err != nil {
 		if errors.Is(err, myerror.ErrorUserNotFound) {
-			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorUserNotFound)
+			ResponseErr(c, InvalidParams, myerror.ErrorUserNotFound.Error())
 			return
 		}
 
-		ResponseErr(c, ServerError)
+		ResponseErr(c, ServerError, nil)
 		return
 	}
 

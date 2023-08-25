@@ -16,7 +16,7 @@ func JwtAuth() func(c *gin.Context) {
 		bearerToken := c.Request.Header.Get("Authorization")
 
 		if bearerToken == "" {
-			controller.ResponseErr(c, controller.NoAuthorized)
+			controller.ResponseErr(c, controller.NoAuthorized, nil)
 			c.Abort()
 			return
 		}
@@ -25,7 +25,7 @@ func JwtAuth() func(c *gin.Context) {
 		parts := strings.SplitN(bearerToken, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			zap.L().Debug("走到这，token格式不对")
-			controller.ResponseErr(c, controller.InvalidToken)
+			controller.ResponseErr(c, controller.InvalidToken, nil)
 			c.Abort()
 			return
 		}
@@ -34,12 +34,12 @@ func JwtAuth() func(c *gin.Context) {
 		if err != nil {
 
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				controller.ResponseErr(c, controller.TokenExpired)
+				controller.ResponseErr(c, controller.TokenExpired, nil)
 				c.Abort()
 				return
 			}
 
-			controller.ResponseErr(c, controller.InvalidToken)
+			controller.ResponseErr(c, controller.InvalidToken, nil)
 			c.Abort()
 			return
 		}
