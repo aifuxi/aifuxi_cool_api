@@ -9,7 +9,6 @@ import (
 	"api.aifuxi.cool/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -21,19 +20,16 @@ func GetTags(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.GetTags: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.GetTags: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
 
 	tags, total, err := service.GetTags(getTagsDTO)
 	if err != nil {
-		zap.L().Error("controller.GetTags: get tags error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -48,19 +44,16 @@ func CreateTag(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.CreateTag: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.CreateTag: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
 
 	tag, err := service.CreateTag(createTagDTO)
 	if err != nil {
-		zap.L().Error("controller.CreateTag: create tag error", zap.Error(err))
 		ResponseErrWithMsg(c, InvalidParams, err.Error())
 		return
 	}
@@ -73,7 +66,6 @@ func GetTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.GetTagByID: invalid tag id", zap.String("error", "invalid tag id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
 		return
 	}
@@ -81,12 +73,10 @@ func GetTagByID(c *gin.Context) {
 	tag, err := service.GetTagByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.L().Error("controller.GetTagByID: tag not found", zap.Error(gorm.ErrRecordNotFound))
 			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		zap.L().Error("controller.GetTagByID: get tag error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -99,7 +89,6 @@ func UpdateTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.UpdateTagByID: invalid tag id", zap.String("error", "invalid tag id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
 		return
 	}
@@ -109,12 +98,10 @@ func UpdateTagByID(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.UpdateTagByID: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.UpdateTagByID: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
@@ -122,12 +109,10 @@ func UpdateTagByID(c *gin.Context) {
 	err = service.UpdateTagByID(id, updateTagDTO)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.L().Error("controller.UpdateTagByID: tag not found", zap.Error(gorm.ErrRecordNotFound))
 			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		zap.L().Error("controller.UpdateTagByID: get tag error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -140,7 +125,6 @@ func DeleteTagByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.DeleteTagByID: invalid tag id", zap.String("error", "invalid tag id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid tag id")
 		return
 	}
@@ -148,12 +132,10 @@ func DeleteTagByID(c *gin.Context) {
 	err = service.DeleteTagByID(id)
 	if err != nil {
 		if errors.Is(err, myerror.ErrorTagNotFound) {
-			zap.L().Error("controller.DeleteTagByID: tag not found", zap.Error(myerror.ErrorTagNotFound))
 			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorTagNotFound)
 			return
 		}
 
-		zap.L().Error("controller.DeleteTagByID: delete tag error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}

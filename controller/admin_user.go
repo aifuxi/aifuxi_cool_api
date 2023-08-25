@@ -9,7 +9,6 @@ import (
 	"api.aifuxi.cool/service"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -21,19 +20,16 @@ func GetUsers(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.GetUsers: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.GetUsers: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
 
 	users, total, err := service.GetUsers(getUsersDTO)
 	if err != nil {
-		zap.L().Error("controller.GetUsers: get users error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -45,7 +41,6 @@ func GetUserProfile(c *gin.Context) {
 	if email, exists := c.Get("email"); exists {
 		user, err := service.GetUserProfile((email.(string)))
 		if err != nil {
-			zap.L().Error("controller.GetUserProfile: get user profile error", zap.Error(err))
 			ResponseErr(c, ServerError)
 			return
 		}
@@ -63,19 +58,16 @@ func CreateUser(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.CreateUser: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.CreateUser: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
 
 	user, err := service.CreateUser(createUserDTO)
 	if err != nil {
-		zap.L().Error("controller.CreateUser: create user error", zap.Error(err))
 		ResponseErrWithMsg(c, InvalidParams, err.Error())
 		return
 	}
@@ -88,7 +80,6 @@ func GetUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.GetUserByID: invalid user id", zap.String("error", "invalid user id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
 		return
 	}
@@ -96,12 +87,10 @@ func GetUserByID(c *gin.Context) {
 	user, err := service.GetUserByID(id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.L().Error("controller.GetUserByID: user not found", zap.Error(gorm.ErrRecordNotFound))
 			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		zap.L().Error("controller.GetUserByID: get user error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -114,7 +103,6 @@ func UpdateUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.UpdateUserByID: invalid user id", zap.String("error", "invalid user id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
 		return
 	}
@@ -124,12 +112,10 @@ func UpdateUserByID(c *gin.Context) {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
-			zap.L().Error("controller.UpdateUserByID: validation params failed", zap.Error(errs))
 			ResponseErrWithMsg(c, InvalidParams, errs.Error())
 			return
 		}
 
-		zap.L().Error("controller.UpdateUserByID: invalid params", zap.Error(err))
 		ResponseErr(c, InvalidParams)
 		return
 	}
@@ -137,12 +123,10 @@ func UpdateUserByID(c *gin.Context) {
 	err = service.UpdateUserByID(id, updateUserDTO)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			zap.L().Error("controller.UpdateUserByID: user not found", zap.Error(gorm.ErrRecordNotFound))
 			ResponseErrWithMsg(c, InvalidParams, gorm.ErrRecordNotFound.Error())
 			return
 		}
 
-		zap.L().Error("controller.UpdateUserByID: get user error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
@@ -155,7 +139,6 @@ func DeleteUserByID(c *gin.Context) {
 
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
-		zap.L().Error("controller.DeleteUserByID: invalid user id", zap.String("error", "invalid user id"))
 		ResponseErrWithMsg(c, InvalidParams, "invalid user id")
 		return
 	}
@@ -163,12 +146,10 @@ func DeleteUserByID(c *gin.Context) {
 	err = service.DeleteUserByID(id)
 	if err != nil {
 		if errors.Is(err, myerror.ErrorUserNotFound) {
-			zap.L().Error("controller.DeleteUserByID: user not found", zap.Error(myerror.ErrorUserNotFound))
 			ResponseErrWithMsg(c, InvalidParams, myerror.ErrorUserNotFound)
 			return
 		}
 
-		zap.L().Error("controller.DeleteUserByID: delete user error", zap.Error(err))
 		ResponseErr(c, ServerError)
 		return
 	}
