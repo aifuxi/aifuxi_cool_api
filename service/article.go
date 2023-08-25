@@ -7,19 +7,19 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetArticles(data *dto.GetArticlesDTO) (*[]models.Article, int64, error) {
+func GetArticles(data dto.GetArticlesDTO) ([]models.Article, int64, error) {
 	return mysql.GetArticles(data)
 }
 
-func CreateArticle(data *dto.CreateArticleDTO) (*models.Article, error) {
+func CreateArticle(data dto.CreateArticleDTO) (models.Article, error) {
 	return mysql.CreateArticle(data)
 }
 
-func GetArticleByID(id int64) (*models.Article, error) {
+func GetArticleByID(id int64) (models.Article, error) {
 	return mysql.GetArticleByID(id)
 }
 
-func UpdateArticleByID(id int64, data *dto.UpdateArticleDTO) error {
+func UpdateArticleByID(id int64, data dto.UpdateArticleDTO) error {
 	if !mysql.ArticleExistsByID(id) {
 		return myerror.ErrorArticleNotFound
 	}

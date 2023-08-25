@@ -10,67 +10,54 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetUsers(data *dto.GetUsersDTO) (*[]models.User, int64, error) {
-	users := new([]models.User)
-	var total int64
-	var nicknameLike, emailLike string
+func GetUsers(data dto.GetUsersDTO) ([]models.User, int64, error) {
+	var users []models.User
+	var count int64
+	var queryDB = db.Model(models.User{}).Scopes(isDeletedRecord)
 
-	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
 	if len(data.Nickname) > 0 {
-		nicknameLike = "%" + data.Nickname + "%"
+		queryDB.Where("nickname LIKE ?", "%"+data.Nickname+"%")
 	}
 
 	if len(data.Email) > 0 {
-		emailLike = "%" + data.Email + "%"
+		queryDB.Where("email LIKE ?", "%"+data.Email+"%")
 	}
 
-	if len(data.Nickname) == 0 && len(data.Email) == 0 {
-		nicknameLike = "%" + data.Nickname + "%"
-		emailLike = "%" + data.Email + "%"
-	}
+	queryDB = queryDB.Count(&count)
 
-	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
-		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
-	).Find(users).Error
+	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
+	err := queryDB.Order(order).Scopes(Paginate(data.Page, data.PageSize)).Find(&users).Error
 	if err != nil {
-		return nil, total, err
+		return nil, count, err
 	}
 
-	err = db.Model(models.User{}).Scopes(isDeletedRecord).Where(
-		db.Where("nickname LIKE ?", nicknameLike).Or("email LIKE ?", emailLike),
-	).Count(&total).Error
-	if err != nil {
-		return nil, total, err
-	}
-
-	return users, total, nil
+	return users, count, nil
 }
 
-func GetUserByID(id int64) (*models.User, error) {
-	user := new(models.User)
+func GetUserByID(id int64) (models.User, error) {
+	var user models.User
+
 	err := db.Scopes(isDeletedRecord).First(&user, id).Error
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 
 	return user, nil
 }
 
-func GetUserByEmail(email string) (*models.User, error) {
-	user := new(models.User)
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+
 	err := db.Scopes(isDeletedRecord).Where("email = ?", email).First(&user).Error
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 
 	return user, nil
 }
 
-func UpdateUserByID(id int64, data *dto.UpdateUserDTO) error {
-	var user = &models.User{
-		ID: id,
-	}
-	err := db.Model(user).Scopes(isDeletedRecord).Updates(
+func UpdateUserByID(id int64, data dto.UpdateUserDTO) error {
+	err := db.Model(models.User{}).Scopes(isDeletedRecord).Where("id = ?", id).Updates(
 		models.User{
 			Nickname: data.Nickname,
 			Avatar:   data.Avatar,
@@ -97,37 +84,44 @@ func DeleteUserByID(id int64) error {
 }
 
 func UserExistsByEmail(email string) bool {
-	user := new(models.User)
+	var user models.User
+
 	db.Scopes(isDeletedRecord).Where("email = ?", email).First(&user)
+
 	return user.ID != 0
 }
 
 func UserExistsByID(id int64) bool {
-	user := new(models.User)
+	var user models.User
+
 	db.Scopes(isDeletedRecord).First(&user, id)
+
 	return user.ID != 0
 }
 
-func CreateUser(data *dto.CreateUserDTO) (*models.User, error) {
+func CreateUser(data dto.CreateUserDTO) (models.User, error) {
+	var user models.User
+
 	if exists := UserExistsByEmail(data.Email); exists {
-		return nil, myerror.ErrorUserExists
+		return user, myerror.ErrorUserExists
 	}
 
 	id, err := internal.GenSnowflakeID()
 	if err != nil {
-		return nil, err
+		return user, err
 	}
 
-	user := &models.User{
+	user = models.User{
 		ID:       id,
 		Nickname: data.Nickname,
 		Avatar:   data.Avatar,
 		Email:    data.Email,
 		Password: data.Password,
 	}
-	err = db.Model(&models.User{}).Create(user).Error
+
+	err = db.Create(&user).Error
 	if err != nil {
-		return nil, err
+		return models.User{}, err
 	}
 
 	return user, nil

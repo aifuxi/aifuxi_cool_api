@@ -31,7 +31,7 @@ func GetUsers(c *gin.Context) {
 		return
 	}
 
-	users, total, err := service.GetUsers(&getUsersDTO)
+	users, total, err := service.GetUsers(getUsersDTO)
 	if err != nil {
 		zap.L().Error("controller.GetUsers: get users error", zap.Error(err))
 		ResponseErr(c, ServerError)
@@ -57,9 +57,9 @@ func GetUserProfile(c *gin.Context) {
 }
 
 func CreateUser(c *gin.Context) {
-	createUserDTO := new(dto.CreateUserDTO)
+	var createUserDTO dto.CreateUserDTO
 
-	if err := c.ShouldBindJSON(createUserDTO); err != nil {
+	if err := c.ShouldBindJSON(&createUserDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
@@ -119,8 +119,8 @@ func UpdateUserByID(c *gin.Context) {
 		return
 	}
 
-	updateUserDTO := new(dto.UpdateUserDTO)
-	if err := c.ShouldBindJSON(updateUserDTO); err != nil {
+	var updateUserDTO dto.UpdateUserDTO
+	if err := c.ShouldBindJSON(&updateUserDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {

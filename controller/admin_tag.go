@@ -31,7 +31,7 @@ func GetTags(c *gin.Context) {
 		return
 	}
 
-	tags, total, err := service.GetTags(&getTagsDTO)
+	tags, total, err := service.GetTags(getTagsDTO)
 	if err != nil {
 		zap.L().Error("controller.GetTags: get tags error", zap.Error(err))
 		ResponseErr(c, ServerError)
@@ -42,9 +42,9 @@ func GetTags(c *gin.Context) {
 }
 
 func CreateTag(c *gin.Context) {
-	createTagDTO := new(dto.CreateTagDTO)
+	var createTagDTO dto.CreateTagDTO
 
-	if err := c.ShouldBindJSON(createTagDTO); err != nil {
+	if err := c.ShouldBindJSON(&createTagDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
@@ -104,8 +104,8 @@ func UpdateTagByID(c *gin.Context) {
 		return
 	}
 
-	updateTagDTO := new(dto.UpdateTagDTO)
-	if err := c.ShouldBindJSON(updateTagDTO); err != nil {
+	var updateTagDTO dto.UpdateTagDTO
+	if err := c.ShouldBindJSON(&updateTagDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {

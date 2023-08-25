@@ -10,57 +10,43 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetArticles(data *dto.GetArticlesDTO) (*[]models.Article, int64, error) {
-	articles := new([]models.Article)
-	var total int64
-	var titleLike, friendlyUrlLike string
+func GetArticles(arg dto.GetArticlesDTO) ([]models.Article, int64, error) {
+	var articles []models.Article
+	var count int64
+	var queryDB = db.Model(models.Article{}).Scopes(isDeletedRecord)
 
-	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
-	if len(data.Title) > 0 {
-		titleLike = "%" + data.Title + "%"
+	if len(arg.Title) > 0 {
+		queryDB.Where("title LIKE ?", "%"+arg.Title+"%")
 	}
 
-	if len(data.FriendlyUrl) > 0 {
-		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
+	if len(arg.FriendlyUrl) > 0 {
+		queryDB.Where("friendly_url LIKE ?", "%"+arg.FriendlyUrl+"%")
 	}
 
-	if len(data.Title) == 0 && len(data.FriendlyUrl) == 0 {
-		titleLike = "%" + data.Title + "%"
-		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
-	}
+	queryDB = queryDB.Count(&count)
 
-	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
-		db.Where("title LIKE ?", titleLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Find(articles).Error
+	order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
+	err := queryDB.Order(order).Scopes(Paginate(arg.Page, arg.PageSize)).Find(&articles).Error
 	if err != nil {
-		return nil, total, err
+		return nil, count, err
 	}
 
-	err = db.Model(models.Article{}).Scopes(isDeletedRecord).Where(
-		db.Where("title LIKE ?", titleLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Count(&total).Error
-	if err != nil {
-		return nil, total, err
-	}
-
-	return articles, total, nil
+	return articles, count, nil
 }
 
-func GetArticleByID(id int64) (*models.Article, error) {
-	article := new(models.Article)
+func GetArticleByID(id int64) (models.Article, error) {
+	var article models.Article
+
 	err := db.Scopes(isDeletedRecord).First(&article, id).Error
 	if err != nil {
-		return nil, err
+		return article, err
 	}
 
 	return article, nil
 }
 
-func UpdateArticleByID(id int64, data *dto.UpdateArticleDTO) error {
-	var article = &models.Article{
-		ID: id,
-	}
-	err := db.Model(article).Scopes(isDeletedRecord).Limit(1).Updates(
+func UpdateArticleByID(id int64, data dto.UpdateArticleDTO) error {
+	err := db.Model(models.Article{}).Scopes(isDeletedRecord).Where("id = ?", id).Limit(1).Updates(
 		models.Article{
 			Title:       data.Title,
 			Description: data.Description,
@@ -91,28 +77,34 @@ func DeleteArticleByID(id int64) error {
 }
 
 func ArticleExistsByTitle(title string) bool {
-	article := new(models.Article)
+	var article models.Article
+
 	db.Scopes(isDeletedRecord).Where("title = ?", title).First(&article)
+
 	return article.ID != 0
 }
 
 func ArticleExistsByID(id int64) bool {
-	article := new(models.Article)
+	var article models.Article
+
 	db.Scopes(isDeletedRecord).First(&article, id)
+
 	return article.ID != 0
 }
 
-func CreateArticle(data *dto.CreateArticleDTO) (*models.Article, error) {
+func CreateArticle(data dto.CreateArticleDTO) (models.Article, error) {
+	var article models.Article
+
 	if exists := ArticleExistsByTitle(data.Title); exists {
-		return nil, myerror.ErrorArticleExists
+		return article, myerror.ErrorArticleExists
 	}
 
 	id, err := internal.GenSnowflakeID()
 	if err != nil {
-		return nil, err
+		return article, err
 	}
 
-	article := &models.Article{
+	article = models.Article{
 		ID:          id,
 		Title:       data.Title,
 		Description: data.Description,
@@ -122,9 +114,10 @@ func CreateArticle(data *dto.CreateArticleDTO) (*models.Article, error) {
 		TopPriority: data.TopPriority,
 		FriendlyUrl: data.FriendlyUrl,
 	}
-	err = db.Model(&models.Article{}).Create(article).Error
+
+	err = db.Model(models.Article{}).Create(article).Error
 	if err != nil {
-		return nil, err
+		return models.Article{}, err
 	}
 
 	return article, nil

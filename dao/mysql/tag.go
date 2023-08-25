@@ -10,57 +10,43 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetTags(data *dto.GetTagsDTO) (*[]models.Tag, int64, error) {
-	tags := new([]models.Tag)
-	var total int64
-	var nameLike, friendlyUrlLike string
+func GetTags(arg dto.GetTagsDTO) ([]models.Tag, int64, error) {
+	var tags []models.Tag
+	var count int64
+	var queryDB = db.Model(models.Tag{}).Scopes(isDeletedRecord)
 
-	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
-	if len(data.Name) > 0 {
-		nameLike = "%" + data.Name + "%"
+	if len(arg.Name) > 0 {
+		queryDB.Where("name LIKE ?", "%"+arg.Name+"%")
 	}
 
-	if len(data.FriendlyUrl) > 0 {
-		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
+	if len(arg.FriendlyUrl) > 0 {
+		queryDB.Where("friendly_url LIKE ?", "%"+arg.FriendlyUrl+"%")
 	}
 
-	if len(data.Name) == 0 && len(data.FriendlyUrl) == 0 {
-		nameLike = "%" + data.Name + "%"
-		friendlyUrlLike = "%" + data.FriendlyUrl + "%"
-	}
+	queryDB = queryDB.Count(&count)
 
-	err := db.Order(order).Scopes(isDeletedRecord, Paginate(data.Page, data.PageSize)).Where(
-		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Find(tags).Error
+	order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
+	err := queryDB.Order(order).Scopes(Paginate(arg.Page, arg.PageSize)).Find(&tags).Error
 	if err != nil {
-		return nil, total, err
+		return nil, count, err
 	}
 
-	err = db.Model(models.Tag{}).Scopes(isDeletedRecord).Where(
-		db.Where("name LIKE ?", nameLike).Or("friendly_url LIKE ?", friendlyUrlLike),
-	).Count(&total).Error
-	if err != nil {
-		return nil, total, err
-	}
-
-	return tags, total, nil
+	return tags, count, nil
 }
 
-func GetTagByID(id int64) (*models.Tag, error) {
-	tag := new(models.Tag)
+func GetTagByID(id int64) (models.Tag, error) {
+	var tag models.Tag
+
 	err := db.Scopes(isDeletedRecord).First(&tag, id).Error
 	if err != nil {
-		return nil, err
+		return tag, err
 	}
 
 	return tag, nil
 }
 
-func UpdateTagByID(id int64, data *dto.UpdateTagDTO) error {
-	var tag = &models.Tag{
-		ID: id,
-	}
-	err := db.Model(tag).Scopes(isDeletedRecord).Limit(1).Updates(
+func UpdateTagByID(id int64, data dto.UpdateTagDTO) error {
+	err := db.Model(models.Tag{}).Scopes(isDeletedRecord).Where("id = ?", id).Limit(1).Updates(
 		models.Tag{
 			Name:        data.Name,
 			FriendlyUrl: data.FriendlyUrl,
@@ -86,35 +72,39 @@ func DeleteTagByID(id int64) error {
 }
 
 func TagExistsByName(name string) bool {
-	tag := new(models.Tag)
+	var tag models.Tag
 	db.Scopes(isDeletedRecord).Where("name = ?", name).First(&tag)
+
 	return tag.ID != 0
 }
 
 func TagExistsByID(id int64) bool {
-	tag := new(models.Tag)
+	var tag models.Tag
 	db.Scopes(isDeletedRecord).First(&tag, id)
+
 	return tag.ID != 0
 }
 
-func CreateTag(data *dto.CreateTagDTO) (*models.Tag, error) {
+func CreateTag(data dto.CreateTagDTO) (models.Tag, error) {
+	var tag models.Tag
+
 	if exists := TagExistsByName(data.Name); exists {
-		return nil, myerror.ErrorTagExists
+		return tag, myerror.ErrorTagExists
 	}
 
 	id, err := internal.GenSnowflakeID()
 	if err != nil {
-		return nil, err
+		return tag, err
 	}
 
-	tag := &models.Tag{
+	tag = models.Tag{
 		ID:          id,
 		Name:        data.Name,
 		FriendlyUrl: data.FriendlyUrl,
 	}
-	err = db.Model(&models.Tag{}).Create(tag).Error
+	err = db.Model(&models.Tag{}).Create(&tag).Error
 	if err != nil {
-		return nil, err
+		return tag, err
 	}
 
 	return tag, nil

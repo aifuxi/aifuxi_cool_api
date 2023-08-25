@@ -9,9 +9,9 @@ import (
 )
 
 func SignUp(c *gin.Context) {
-	signUpDTO := new(dto.SignUpDTO)
+	var signUpDTO dto.SignUpDTO
 
-	if err := c.ShouldBindJSON(signUpDTO); err != nil {
+	if err := c.ShouldBindJSON(&signUpDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
@@ -36,9 +36,9 @@ func SignUp(c *gin.Context) {
 }
 
 func SignIn(c *gin.Context) {
-	signInDto := new(dto.SignInDTO)
+	var signInDto dto.SignInDTO
 
-	if err := c.ShouldBindJSON(signInDto); err != nil {
+	if err := c.ShouldBindJSON(&signInDto); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {

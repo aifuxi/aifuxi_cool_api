@@ -31,7 +31,7 @@ func GetArticles(c *gin.Context) {
 		return
 	}
 
-	articles, total, err := service.GetArticles(&getArticlesDTO)
+	articles, total, err := service.GetArticles(getArticlesDTO)
 	if err != nil {
 		zap.L().Error("controller.GetArticles: get articles error", zap.Error(err))
 		ResponseErr(c, ServerError)
@@ -42,9 +42,9 @@ func GetArticles(c *gin.Context) {
 }
 
 func CreateArticle(c *gin.Context) {
-	createArticleDTO := new(dto.CreateArticleDTO)
+	var createArticleDTO dto.CreateArticleDTO
 
-	if err := c.ShouldBindJSON(createArticleDTO); err != nil {
+	if err := c.ShouldBindJSON(&createArticleDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {
@@ -104,8 +104,8 @@ func UpdateArticleByID(c *gin.Context) {
 		return
 	}
 
-	updateArticleDTO := new(dto.UpdateArticleDTO)
-	if err := c.ShouldBindJSON(updateArticleDTO); err != nil {
+	var updateArticleDTO dto.UpdateArticleDTO
+	if err := c.ShouldBindJSON(&updateArticleDTO); err != nil {
 		// 获取validator.ValidationErrors类型的errors
 		errs, ok := err.(validator.ValidationErrors)
 		if ok {

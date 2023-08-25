@@ -9,8 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignUp(data *dto.SignUpDTO) (*models.User, error) {
-	return CreateUser(&dto.CreateUserDTO{
+func SignUp(data dto.SignUpDTO) (models.User, error) {
+	return CreateUser(dto.CreateUserDTO{
 		Nickname:   data.Nickname,
 		Email:      data.Email,
 		Password:   data.Password,
@@ -18,7 +18,7 @@ func SignUp(data *dto.SignUpDTO) (*models.User, error) {
 	})
 }
 
-func SignIn(data *dto.SignInDTO) (string, error) {
+func SignIn(data dto.SignInDTO) (string, error) {
 	// 1. 根据email查找用户
 	if exists := mysql.UserExistsByEmail(data.Email); !exists {
 		return "", myerror.ErrorUserNotFound
