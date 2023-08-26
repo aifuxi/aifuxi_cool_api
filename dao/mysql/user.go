@@ -9,23 +9,23 @@ import (
 	"api.aifuxi.cool/myerror"
 )
 
-func GetUsers(data dto.GetUsersDTO) ([]models.User, int64, error) {
+func GetUsers(arg dto.GetUsersDTO) ([]models.User, int64, error) {
 	var users []models.User
 	var count int64
 	var queryDB = db.Model(models.User{}).Scopes(isDeletedRecord)
 
-	if len(data.Nickname) > 0 {
-		queryDB.Where("nickname LIKE ?", "%"+data.Nickname+"%")
+	if len(arg.Nickname) > 0 {
+		queryDB.Where("nickname LIKE ?", "%"+arg.Nickname+"%")
 	}
 
-	if len(data.Email) > 0 {
-		queryDB.Where("email LIKE ?", "%"+data.Email+"%")
+	if len(arg.Email) > 0 {
+		queryDB.Where("email LIKE ?", "%"+arg.Email+"%")
 	}
 
 	queryDB = queryDB.Count(&count)
 
-	order := fmt.Sprintf("%s %s", data.OrderBy, data.Order)
-	err := queryDB.Order(order).Scopes(Paginate(data.Page, data.PageSize)).Find(&users).Error
+	order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
+	err := queryDB.Order(order).Scopes(Paginate(arg.Page, arg.PageSize)).Find(&users).Error
 	if err != nil {
 		return nil, count, err
 	}
@@ -55,12 +55,12 @@ func GetUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
-func UpdateUserByID(id int64, data dto.UpdateUserDTO) error {
+func UpdateUserByID(id int64, arg dto.UpdateUserDTO) error {
 	err := db.Model(models.User{}).Scopes(isDeletedRecord).Where("id = ?", id).Updates(
 		models.User{
-			Nickname: data.Nickname,
-			Avatar:   data.Avatar,
-			Password: data.Password,
+			Nickname: arg.Nickname,
+			Avatar:   arg.Avatar,
+			Password: arg.Password,
 		}).Limit(1).Error
 	if err != nil {
 		return err
@@ -98,18 +98,18 @@ func UserExistsByID(id int64) bool {
 	return user.ID != 0
 }
 
-func CreateUser(data dto.CreateUserDTO) (models.User, error) {
+func CreateUser(arg dto.CreateUserDTO) (models.User, error) {
 	var user models.User
 
-	if exists := UserExistsByEmail(data.Email); exists {
+	if exists := UserExistsByEmail(arg.Email); exists {
 		return user, myerror.ErrorUserExists
 	}
 
 	user = models.User{
-		Nickname: data.Nickname,
-		Avatar:   data.Avatar,
-		Email:    data.Email,
-		Password: data.Password,
+		Nickname: arg.Nickname,
+		Avatar:   arg.Avatar,
+		Email:    arg.Email,
+		Password: arg.Password,
 	}
 
 	err := db.Create(&user).Error

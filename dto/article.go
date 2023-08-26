@@ -8,6 +8,7 @@ type CreateArticleDTO struct {
 	FriendlyUrl string `json:"friendly_url" binding:"required"`
 	IsTop       bool   `json:"is_top"`
 	TopPriority int    `json:"top_priority"`
+	IsPublished bool   `json:"is_published"`
 }
 
 type UpdateArticleDTO struct {
@@ -18,6 +19,7 @@ type UpdateArticleDTO struct {
 	FriendlyUrl string `json:"friendly_url"`
 	IsTop       bool   `json:"is_top"`
 	TopPriority int    `json:"top_priority"`
+	IsPublished bool   `json:"is_published"`
 }
 
 type GetArticlesDTO struct {

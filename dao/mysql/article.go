@@ -44,16 +44,17 @@ func GetArticleByID(id int64) (models.Article, error) {
 	return article, nil
 }
 
-func UpdateArticleByID(id int64, data dto.UpdateArticleDTO) error {
+func UpdateArticleByID(id int64, arg dto.UpdateArticleDTO) error {
 	err := db.Model(models.Article{}).Scopes(isDeletedRecord).Where("id = ?", id).Limit(1).Updates(
 		models.Article{
-			Title:       data.Title,
-			Description: data.Description,
-			Content:     data.Content,
-			Cover:       data.Cover,
-			IsTop:       data.IsTop,
-			TopPriority: data.TopPriority,
-			FriendlyUrl: data.FriendlyUrl,
+			Title:       arg.Title,
+			Description: arg.Description,
+			Content:     arg.Content,
+			Cover:       arg.Cover,
+			IsTop:       arg.IsTop,
+			TopPriority: arg.TopPriority,
+			FriendlyUrl: arg.FriendlyUrl,
+			IsPublished: arg.IsPublished,
 		}).Error
 	if err != nil {
 		return err
@@ -91,25 +92,25 @@ func ArticleExistsByID(id int64) bool {
 	return article.ID != 0
 }
 
-func CreateArticle(data dto.CreateArticleDTO) (models.Article, error) {
+func CreateArticle(arg dto.CreateArticleDTO) (models.Article, error) {
 	var article models.Article
 
-	if exists := ArticleExistsByTitle(data.Title); exists {
+	if exists := ArticleExistsByTitle(arg.Title); exists {
 		return article, myerror.ErrorArticleExists
 	}
 
 	article = models.Article{
-
-		Title:       data.Title,
-		Description: data.Description,
-		Content:     data.Content,
-		Cover:       data.Cover,
-		IsTop:       data.IsTop,
-		TopPriority: data.TopPriority,
-		FriendlyUrl: data.FriendlyUrl,
+		Title:       arg.Title,
+		Description: arg.Description,
+		Content:     arg.Content,
+		Cover:       arg.Cover,
+		IsTop:       arg.IsTop,
+		TopPriority: arg.TopPriority,
+		FriendlyUrl: arg.FriendlyUrl,
+		IsPublished: arg.IsPublished,
 	}
 
-	err := db.Model(models.Article{}).Create(article).Error
+	err := db.Model(models.Article{}).Create(&article).Error
 	if err != nil {
 		return models.Article{}, err
 	}

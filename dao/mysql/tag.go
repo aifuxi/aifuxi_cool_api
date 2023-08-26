@@ -44,11 +44,11 @@ func GetTagByID(id int64) (models.Tag, error) {
 	return tag, nil
 }
 
-func UpdateTagByID(id int64, data dto.UpdateTagDTO) error {
+func UpdateTagByID(id int64, arg dto.UpdateTagDTO) error {
 	err := db.Model(models.Tag{}).Scopes(isDeletedRecord).Where("id = ?", id).Limit(1).Updates(
 		models.Tag{
-			Name:        data.Name,
-			FriendlyUrl: data.FriendlyUrl,
+			Name:        arg.Name,
+			FriendlyUrl: arg.FriendlyUrl,
 		}).Error
 	if err != nil {
 		return err
@@ -84,16 +84,16 @@ func TagExistsByID(id int64) bool {
 	return tag.ID != 0
 }
 
-func CreateTag(data dto.CreateTagDTO) (models.Tag, error) {
+func CreateTag(arg dto.CreateTagDTO) (models.Tag, error) {
 	var tag models.Tag
 
-	if exists := TagExistsByName(data.Name); exists {
+	if exists := TagExistsByName(arg.Name); exists {
 		return tag, myerror.ErrorTagExists
 	}
 
 	tag = models.Tag{
-		Name:        data.Name,
-		FriendlyUrl: data.FriendlyUrl,
+		Name:        arg.Name,
+		FriendlyUrl: arg.FriendlyUrl,
 	}
 	err := db.Model(&models.Tag{}).Create(&tag).Error
 	if err != nil {
