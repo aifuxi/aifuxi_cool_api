@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"api.aifuxi.cool/dto"
@@ -115,5 +116,20 @@ func CreateArticle(arg dto.CreateArticleDTO) (models.Article, error) {
 		return models.Article{}, err
 	}
 
+	fmt.Printf("arg.TagIDs: %v\n", arg.TagIDs)
+	// 把文章和标签关联起来
+	err = createArticleTagRecord(article.ID, arg.TagIDs)
+	if err != nil {
+		return models.Article{}, err
+	}
+
+	var tags []models.Tag
+	for _, v := range arg.TagIDs {
+		id, _ := strconv.ParseInt(v, 10, 64)
+		tag, _ := GetTagByID(id)
+		tags = append(tags, tag)
+	}
+
+	article.Tags = tags
 	return article, nil
 }

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 
 	"api.aifuxi.cool/dto"
@@ -48,10 +49,10 @@ func CreateArticle(c *gin.Context) {
 			return
 		}
 
-		ResponseErr(c, InvalidParams, nil)
+		ResponseErr(c, InvalidParams, err)
 		return
 	}
-
+	fmt.Printf("createArticleDTO: %v\n", createArticleDTO)
 	article, err := service.CreateArticle(createArticleDTO)
 	if err != nil {
 		ResponseErr(c, InvalidParams, err.Error())

@@ -20,6 +20,7 @@ type Article struct {
 	IsTop       bool       `gorm:"column:is_top;type:bool" json:"is_top"`
 	TopPriority int        `gorm:"column:top_priority;type:int" json:"top_priority"`
 	IsPublished bool       `gorm:"column:is_published;type:bool" json:"is_published"`
+	Tags        []Tag      `gorm:"-" json:"tags"`
 }
 
 // GORM 自定义表名
