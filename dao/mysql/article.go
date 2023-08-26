@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"api.aifuxi.cool/dto"
-	"api.aifuxi.cool/internal"
 	"api.aifuxi.cool/models"
 	"api.aifuxi.cool/myerror"
 )
@@ -99,13 +98,8 @@ func CreateArticle(data dto.CreateArticleDTO) (models.Article, error) {
 		return article, myerror.ErrorArticleExists
 	}
 
-	id, err := internal.GenSnowflakeID()
-	if err != nil {
-		return article, err
-	}
-
 	article = models.Article{
-		ID:          id,
+
 		Title:       data.Title,
 		Description: data.Description,
 		Content:     data.Content,
@@ -115,7 +109,7 @@ func CreateArticle(data dto.CreateArticleDTO) (models.Article, error) {
 		FriendlyUrl: data.FriendlyUrl,
 	}
 
-	err = db.Model(models.Article{}).Create(article).Error
+	err := db.Model(models.Article{}).Create(article).Error
 	if err != nil {
 		return models.Article{}, err
 	}

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"api.aifuxi.cool/dto"
-	"api.aifuxi.cool/internal"
 	"api.aifuxi.cool/models"
 	"api.aifuxi.cool/myerror"
 )
@@ -106,20 +105,14 @@ func CreateUser(data dto.CreateUserDTO) (models.User, error) {
 		return user, myerror.ErrorUserExists
 	}
 
-	id, err := internal.GenSnowflakeID()
-	if err != nil {
-		return user, err
-	}
-
 	user = models.User{
-		ID:       id,
 		Nickname: data.Nickname,
 		Avatar:   data.Avatar,
 		Email:    data.Email,
 		Password: data.Password,
 	}
 
-	err = db.Create(&user).Error
+	err := db.Create(&user).Error
 	if err != nil {
 		return models.User{}, err
 	}

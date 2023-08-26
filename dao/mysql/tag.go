@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"api.aifuxi.cool/dto"
-	"api.aifuxi.cool/internal"
 	"api.aifuxi.cool/models"
 	"api.aifuxi.cool/myerror"
 )
@@ -92,17 +91,11 @@ func CreateTag(data dto.CreateTagDTO) (models.Tag, error) {
 		return tag, myerror.ErrorTagExists
 	}
 
-	id, err := internal.GenSnowflakeID()
-	if err != nil {
-		return tag, err
-	}
-
 	tag = models.Tag{
-		ID:          id,
 		Name:        data.Name,
 		FriendlyUrl: data.FriendlyUrl,
 	}
-	err = db.Model(&models.Tag{}).Create(&tag).Error
+	err := db.Model(&models.Tag{}).Create(&tag).Error
 	if err != nil {
 		return tag, err
 	}

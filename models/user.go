@@ -1,6 +1,11 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"api.aifuxi.cool/internal"
+	"gorm.io/gorm"
+)
 
 type User struct {
 	ID        int64      `gorm:"column:id;type:bigint;primaryKey" json:"id,string"`
@@ -16,4 +21,16 @@ type User struct {
 // GORM 自定义表名
 func (User) TableName() string {
 	return "user"
+}
+
+func (user *User) BeforeCreate(tx *gorm.DB) error {
+	id, err := internal.GenSnowflakeID()
+
+	if err != nil {
+		return err
+	}
+
+	user.ID = id
+
+	return nil
 }
