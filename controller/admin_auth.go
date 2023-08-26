@@ -46,7 +46,7 @@ func SignIn(c *gin.Context) {
 		return
 	}
 
-	token, err := service.SignIn(signInDto)
+	token, user, err := service.SignIn(signInDto)
 	if err != nil {
 		ResponseErr(c, InvalidParams, err.Error())
 		return
@@ -54,5 +54,6 @@ func SignIn(c *gin.Context) {
 
 	ResponseOk(c, gin.H{
 		"access_token": token,
+		"user":         user,
 	})
 }

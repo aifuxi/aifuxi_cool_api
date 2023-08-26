@@ -9,33 +9,34 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func SignUp(data dto.SignUpDTO) (models.User, error) {
+func SignUp(arg dto.SignUpDTO) (models.User, error) {
 	return CreateUser(dto.CreateUserDTO{
-		Nickname:   data.Nickname,
-		Email:      data.Email,
-		Password:   data.Password,
-		RePassword: data.RePassword,
+		Nickname:   arg.Nickname,
+		Email:      arg.Email,
+		Password:   arg.Password,
+		RePassword: arg.RePassword,
 	})
 }
 
-func SignIn(data dto.SignInDTO) (string, error) {
+func SignIn(arg dto.SignInDTO) (string, models.User, error) {
 	// 1. 根据email查找用户
-	if exists := mysql.UserExistsByEmail(data.Email); !exists {
-		return "", myerror.ErrorUserNotFound
+	if exists := mysql.UserExistsByEmail(arg.Email); !exists {
+		return "", models.User{}, myerror.ErrorUserNotFound
 	}
 
-	user, err := mysql.GetUserByEmail(data.Email)
+	user, err := mysql.GetUserByEmail(arg.Email)
 	if err != nil {
-		return "", err
+		return "", models.User{}, err
 	}
+
 	// 2. 判断密码对不对
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(arg.Password))
 	if err != nil {
-		return "", myerror.ErrorIncorrectPassword
+		return "", models.User{}, myerror.ErrorIncorrectPassword
 	}
 
 	// 3. 生成 token
-	token, err := internal.GenToken(data.Email)
+	token, err := internal.GenToken(arg.Email)
 
-	return token, err
+	return token, user, err
 }

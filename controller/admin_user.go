@@ -37,20 +37,6 @@ func GetUsers(c *gin.Context) {
 	ResponseOkWithTotal(c, users, total)
 }
 
-func GetUserProfile(c *gin.Context) {
-	if email, exists := c.Get("email"); exists {
-		user, err := service.GetUserProfile((email.(string)))
-		if err != nil {
-			ResponseErr(c, ServerError, nil)
-			return
-		}
-
-		ResponseOk(c, user)
-	} else {
-		ResponseErr(c, ServerError, nil)
-	}
-}
-
 func CreateUser(c *gin.Context) {
 	var createUserDTO dto.CreateUserDTO
 

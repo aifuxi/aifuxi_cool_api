@@ -8,35 +8,35 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUsers(data dto.GetUsersDTO) ([]models.User, int64, error) {
-	return mysql.GetUsers(data)
+func GetUsers(arg dto.GetUsersDTO) ([]models.User, int64, error) {
+	return mysql.GetUsers(arg)
 }
 
 func GetUserProfile(email string) (models.User, error) {
 	return mysql.GetUserByEmail(email)
 }
 
-func CreateUser(data dto.CreateUserDTO) (models.User, error) {
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
+func CreateUser(arg dto.CreateUserDTO) (models.User, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(arg.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return models.User{}, err
 	}
 
-	data.Password = string(hashedPassword)
+	arg.Password = string(hashedPassword)
 
-	return mysql.CreateUser(data)
+	return mysql.CreateUser(arg)
 }
 
 func GetUserByID(id int64) (models.User, error) {
 	return mysql.GetUserByID(id)
 }
 
-func UpdateUserByID(id int64, data dto.UpdateUserDTO) error {
+func UpdateUserByID(id int64, arg dto.UpdateUserDTO) error {
 	if !mysql.UserExistsByID(id) {
 		return myerror.ErrorUserNotFound
 	}
 
-	return mysql.UpdateUserByID(id, data)
+	return mysql.UpdateUserByID(id, arg)
 }
 
 func DeleteUserByID(id int64) error {

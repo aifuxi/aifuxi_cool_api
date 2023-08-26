@@ -47,9 +47,6 @@ func initAdminAuthRouterGroup(r *gin.Engine) {
 	// 获取用户列表
 	adminAuthGroup.GET("/users", controller.GetUsers)
 
-	// 获取当前登录用户的信息
-	adminAuthGroup.GET("/users/profile", controller.GetUserProfile)
-
 	// 创建用户
 	adminAuthGroup.POST("/users", controller.CreateUser)
 
