@@ -32,3 +32,33 @@ func createArticleTagRecord(articleID int64, tagIDs []string) error {
 
 	return nil
 }
+
+func createArticleTag(articleID int64, tagID int64) error {
+	articleTag := models.ArticleTag{
+		ArticleID: articleID,
+		TagID:     tagID,
+	}
+	err := db.Model(models.ArticleTag{}).Create(&articleTag).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func deleteArticleTag(articleID int64, tagID int64) error {
+	err := db.Delete(models.ArticleTag{}, models.ArticleTag{ArticleID: articleID, TagID: tagID}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func deleteArticleTagByArticleID(articleID int64) error {
+	err := db.Delete(models.ArticleTag{}, models.ArticleTag{ArticleID: articleID}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

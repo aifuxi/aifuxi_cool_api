@@ -30,7 +30,23 @@ func GetTags(arg dto.GetTagsDTO) ([]models.Tag, int64, error) {
 		return nil, count, err
 	}
 
+	for i, tag := range tags {
+		articleCount, _ := GetTagArticleCount(tag.ID)
+		tags[i].ArticleCount = articleCount
+	}
+
 	return tags, count, nil
+}
+
+func GetTagArticleCount(id int64) (int, error) {
+	var articleTagIDs []models.ArticleTag
+
+	err := db.Model(models.ArticleTag{}).Where("tag_id = ?", id).Find(&articleTagIDs).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return len(articleTagIDs), nil
 }
 
 func GetTagByID(id int64) (models.Tag, error) {
@@ -40,6 +56,13 @@ func GetTagByID(id int64) (models.Tag, error) {
 	if err != nil {
 		return tag, err
 	}
+
+	articleCount, err := GetTagArticleCount(tag.ID)
+	if err != nil {
+		return tag, err
+	}
+
+	tag.ArticleCount = articleCount
 
 	return tag, nil
 }

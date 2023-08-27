@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"api.aifuxi.cool/dto"
+	"api.aifuxi.cool/internal"
 	"api.aifuxi.cool/models"
 	"api.aifuxi.cool/myerror"
 )
@@ -31,7 +32,39 @@ func GetArticles(arg dto.GetArticlesDTO) ([]models.Article, int64, error) {
 		return nil, count, err
 	}
 
+	for index, article := range articles {
+		tags, _ := GetTagsByArticleID(article.ID)
+		fmt.Printf("当前文章id: %d, tags: %v\n", article.ID, tags)
+		articles[index].Tags = tags
+	}
+
 	return articles, count, nil
+}
+
+func GetTagsByArticleID(id int64) ([]models.Tag, error) {
+	var articleTagIDs []models.ArticleTag
+	var tagIDs []int64
+	var tags []models.Tag
+
+	err := db.Model(models.ArticleTag{}).Where("article_id = ?", id).Find(&articleTagIDs).Error
+	if err != nil {
+		return nil, err
+	}
+
+	if len(articleTagIDs) == 0 {
+		return tags, nil
+	}
+
+	for _, v := range articleTagIDs {
+		tagIDs = append(tagIDs, v.TagID)
+	}
+
+	err = db.Model(models.Tag{}).Find(&tags, tagIDs).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
 }
 
 func GetArticleByID(id int64) (models.Article, error) {
@@ -41,6 +74,13 @@ func GetArticleByID(id int64) (models.Article, error) {
 	if err != nil {
 		return article, err
 	}
+
+	tags, err := GetTagsByArticleID(article.ID)
+	if err != nil {
+		return article, err
+	}
+
+	article.Tags = tags
 
 	return article, nil
 }
@@ -61,6 +101,40 @@ func UpdateArticleByID(id int64, arg dto.UpdateArticleDTO) error {
 		return err
 	}
 
+	// 先找出文章下所有的tag id
+	var articleTagIDs []models.ArticleTag
+	err = db.Model(models.ArticleTag{}).Where("article_id = ?", id).Find(&articleTagIDs).Error
+	if err != nil {
+		return err
+	}
+	var currentTagIDs []int64
+	fmt.Printf("找到的是articleTagIDs: %v\n", articleTagIDs)
+	for _, v := range articleTagIDs {
+		currentTagIDs = append(currentTagIDs, v.TagID)
+	}
+
+	tagIDs := []int64{}
+
+	for _, v := range arg.TagIDs {
+		tagID, _ := strconv.ParseInt(v, 10, 64)
+		tagIDs = append(tagIDs, tagID)
+	}
+
+	// 判断有没有取消关联tag
+	for _, v := range currentTagIDs {
+		// [1,2,3]  [3]
+		if !internal.FindInt64(tagIDs, v) {
+			deleteArticleTag(id, v)
+		}
+	}
+
+	// 判断有没有新关联tag
+	for _, v := range tagIDs {
+		if !internal.FindInt64(currentTagIDs, v) {
+			createArticleTag(id, v)
+		}
+	}
+
 	return nil
 }
 
@@ -70,6 +144,11 @@ func DeleteArticleByID(id int64) error {
 	}
 
 	err := db.Model(models.Article{}).Where("id = ?", id).Limit(1).Update("deleted_at", time.Now().Local().Format(time.DateTime)).Error
+	if err != nil {
+		return err
+	}
+
+	err = deleteArticleTagByArticleID(id)
 	if err != nil {
 		return err
 	}
