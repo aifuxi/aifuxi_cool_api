@@ -19,6 +19,10 @@ func GetArticleByID(id int64) (models.Article, error) {
 	return mysql.GetArticleByID(id)
 }
 
+func GetArticleByFriendlyUrl(friendlyUrl string) (models.Article, error) {
+	return mysql.GetArticleByFriendlyUrl(friendlyUrl)
+}
+
 func UpdateArticleByID(id int64, arg dto.UpdateArticleDTO) error {
 	if !mysql.ArticleExistsByID(id) {
 		return myerror.ErrorArticleNotFound

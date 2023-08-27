@@ -20,6 +20,7 @@ func Init() *gin.Engine {
 
 	initAdminAuthRouterGroup(r)
 	initAdminPublicRouterGroup(r)
+	initPublicRouterGroup(r)
 
 	return r
 }

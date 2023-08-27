@@ -85,6 +85,24 @@ func GetArticleByID(id int64) (models.Article, error) {
 	return article, nil
 }
 
+func GetArticleByFriendlyUrl(friendlyUrl string) (models.Article, error) {
+	var article models.Article
+
+	err := db.Scopes(isDeletedRecord).First(&article, models.Article{FriendlyUrl: friendlyUrl}).Error
+	if err != nil {
+		return article, err
+	}
+
+	tags, err := GetTagsByArticleID(article.ID)
+	if err != nil {
+		return article, err
+	}
+
+	article.Tags = tags
+
+	return article, nil
+}
+
 func UpdateArticleByID(id int64, arg dto.UpdateArticleDTO) error {
 	err := db.Model(models.Article{}).Scopes(isDeletedRecord).Where("id = ?", id).Limit(1).Updates(
 		models.Article{
