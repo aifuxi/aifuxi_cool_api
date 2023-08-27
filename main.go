@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 
+	"api.aifuxi.cool/api"
 	"api.aifuxi.cool/dao/mysql"
 	"api.aifuxi.cool/logger"
-	"api.aifuxi.cool/routers"
 	"api.aifuxi.cool/settings"
 )
 
@@ -16,9 +16,9 @@ func main() {
 		log.Fatalf("初始化失败: %v\n", err)
 	}
 
-	r := routers.Init()
-	addr := fmt.Sprintf("localhost:%d", settings.AppConfig.Port)
-	r.Run(addr)
+	address := fmt.Sprintf("localhost:%d", settings.AppConfig.Port)
+	server := api.NewServer()
+	server.Start(address)
 }
 
 func Init() error {
