@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"api.aifuxi.cool/api"
-	"api.aifuxi.cool/dao/mysql"
 	"api.aifuxi.cool/logger"
 	"api.aifuxi.cool/settings"
 )
@@ -29,12 +28,6 @@ func Init() error {
 	}
 
 	logger.Init()
-
-	err = mysql.Init()
-	if err != nil {
-		fmt.Printf("连接 MySQL 失败: %v\n", err)
-		return err
-	}
 
 	return nil
 }

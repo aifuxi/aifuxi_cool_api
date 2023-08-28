@@ -2,7 +2,7 @@ package mysql
 
 import "gorm.io/gorm"
 
-func isDeletedRecord(db *gorm.DB) *gorm.DB {
+func DeletedRecord(db *gorm.DB) *gorm.DB {
 	return db.Where("deleted_at is null")
 }
 

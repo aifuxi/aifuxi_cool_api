@@ -4,7 +4,6 @@ import (
 	"errors"
 	"strings"
 
-	"api.aifuxi.cool/controller"
 	"api.aifuxi.cool/internal"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,7 +15,7 @@ func JwtAuth() func(c *gin.Context) {
 		bearerToken := c.Request.Header.Get("Authorization")
 
 		if bearerToken == "" {
-			controller.ResponseErr(c, controller.NoAuthorized, nil)
+			// TODO： 错误处理
 			c.Abort()
 			return
 		}
@@ -25,7 +24,7 @@ func JwtAuth() func(c *gin.Context) {
 		parts := strings.SplitN(bearerToken, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			zap.L().Debug("走到这，token格式不对")
-			controller.ResponseErr(c, controller.InvalidToken, nil)
+			// TODO： 错误处理
 			c.Abort()
 			return
 		}
@@ -34,12 +33,12 @@ func JwtAuth() func(c *gin.Context) {
 		if err != nil {
 
 			if errors.Is(err, jwt.ErrTokenExpired) {
-				controller.ResponseErr(c, controller.TokenExpired, nil)
+				// TODO： 错误处理
 				c.Abort()
 				return
 			}
 
-			controller.ResponseErr(c, controller.InvalidToken, nil)
+			// TODO： 错误处理
 			c.Abort()
 			return
 		}

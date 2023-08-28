@@ -1,11 +1,11 @@
-package dto
+package mysql
 
-type PaginationDTO struct {
+type PaginationParams struct {
 	Page     int `form:"page" binding:"required"`
 	PageSize int `form:"page_size" binding:"required"`
 }
 
-type OrderDTO struct {
+type OrderParams struct {
 	Order   string `form:"order" binding:"required"`
 	OrderBy string `form:"order_by" binding:"required"`
 }

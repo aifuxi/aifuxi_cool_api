@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"api.aifuxi.cool/internal"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -25,12 +26,17 @@ func (User) TableName() string {
 
 func (user *User) BeforeCreate(tx *gorm.DB) error {
 	id, err := internal.GenSnowflakeID()
+	if err != nil {
+		return err
+	}
 
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 
 	user.ID = id
+	user.Password = string(hashedPassword)
 
 	return nil
 }
