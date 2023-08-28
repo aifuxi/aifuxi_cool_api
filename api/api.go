@@ -3,27 +3,31 @@ package api
 import (
 	"path/filepath"
 
-	"api.aifuxi.cool/middleware"
-	"api.aifuxi.cool/settings"
+	"api.aifuxi.cool/db/orm"
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
 	router *gin.Engine
+	store  orm.Store
 }
 
-func NewServer() *Server {
-	server := &Server{}
-	r := gin.New()
+func NewServer(store orm.Store) *Server {
+	server := &Server{
+		store: store,
+	}
+	router := gin.Default()
 
-	gin.SetMode(settings.AppConfig.Mode)
-
-	r.Use(middleware.GinLogger(), middleware.GinRecovery(true))
-
+	// 配置静态文件服务路径
 	rootPath := filepath.Join("uploads")
-	r.Static("/uploads", rootPath)
+	router.Static("/uploads", rootPath)
 
-	server.router = r
+	adminAuthApi := router.Group("/adminapi/auth")
+	{
+		adminAuthApi.GET("/users", server.ListUsers)
+	}
+
+	server.router = router
 
 	return server
 }

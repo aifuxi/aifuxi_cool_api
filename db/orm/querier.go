@@ -1,6 +1,6 @@
-package mysql
+package orm
 
-import "api.aifuxi.cool/db/mysql/models"
+import "api.aifuxi.cool/db/orm/models"
 
 type Querier interface {
 	CreateUser(arg CreateUserParams) (models.User, error)

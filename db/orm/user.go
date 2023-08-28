@@ -1,10 +1,9 @@
-package mysql
+package orm
 
 import (
-	"fmt"
 	"time"
 
-	"api.aifuxi.cool/db/mysql/models"
+	"api.aifuxi.cool/db/orm/models"
 )
 
 type CreateUserParams struct {
@@ -61,8 +60,8 @@ func (q *Queries) ListUsers(arg ListUsersParams) ([]models.User, int64, error) {
 
 	queryDB = queryDB.Count(&count)
 
-	order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
-	err := queryDB.Order(order).Scopes(Paginate(arg.Page, arg.PageSize)).Find(&users).Error
+	// order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
+	err := queryDB.Scopes(Paginate(arg.Page, arg.PageSize)).Find(&users).Error
 	if err != nil {
 		return nil, count, err
 	}
