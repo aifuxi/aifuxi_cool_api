@@ -1,11 +1,9 @@
-package models
+package db
 
 import (
-	"time"
-
-	"api.aifuxi.cool/internal"
-	"golang.org/x/crypto/bcrypt"
+	"api.aifuxi.cool/util"
 	"gorm.io/gorm"
+	"time"
 )
 
 type User struct {
@@ -19,24 +17,24 @@ type User struct {
 	DeletedAt *time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at,omitempty"`
 }
 
-// GORM 自定义表名
-func (User) TableName() string {
+func (u *User) TableName() string {
 	return "user"
 }
 
-func (user *User) BeforeCreate(tx *gorm.DB) error {
-	id, err := internal.GenSnowflakeID()
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+
+	id, err := util.NewSnowflakeID()
 	if err != nil {
 		return err
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	password, err := util.HashPassword(u.Password)
 	if err != nil {
 		return err
 	}
 
-	user.ID = id
-	user.Password = string(hashedPassword)
+	u.ID = id
+	u.Password = password
 
 	return nil
 }

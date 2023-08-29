@@ -1,4 +1,4 @@
-package orm
+package db
 
 import "gorm.io/gorm"
 
@@ -6,6 +6,6 @@ type Queries struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) *Queries {
+func NewQueries(db *gorm.DB) *Queries {
 	return &Queries{db: db}
 }
