@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
+	"time"
 )
 
 var (
-	ErrUserExist = errors.New("用户已存在")
+	ErrUserExist    = errors.New("用户已存在")
+	ErrUserNotFound = errors.New("用户不存在")
 )
 
 type ExistUserParams struct {
@@ -22,7 +24,7 @@ func (q *Queries) ExistUser(arg ExistUserParams) (bool, error) {
 		Email: arg.Email,
 	}
 
-	err := q.db.Debug().First(&user, cond).Error
+	err := q.db.First(&user, cond).Error
 	if err != nil {
 		// 如果 err 是 ErrRecordNotFound，只是记录没找到，不认为是出错了
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -33,7 +35,7 @@ func (q *Queries) ExistUser(arg ExistUserParams) (bool, error) {
 	}
 
 	if user.ID != 0 {
-		return true, ErrUserExist
+		return true, nil
 	}
 
 	return false, nil
@@ -94,8 +96,9 @@ func (q *Queries) CreateUser(arg CreateUserParams) (User, error) {
 	if err != nil {
 		return User{}, err
 	}
+
 	if exist {
-		return User{}, err
+		return User{}, ErrUserExist
 	}
 
 	err = q.db.Create(&user).Error
@@ -104,4 +107,77 @@ func (q *Queries) CreateUser(arg CreateUserParams) (User, error) {
 	}
 
 	return user, nil
+}
+
+func (q *Queries) GetUserByID(id int64) (User, error) {
+	var user User
+
+	err := q.db.First(&user, id).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return User{}, ErrUserNotFound
+		}
+
+		return User{}, err
+	}
+
+	return user, nil
+}
+
+type UpdateUserParams struct {
+	Nickname string
+	Avatar   string
+	Email    string
+	Password string
+}
+
+func (q *Queries) UpdateUser(id int64, arg UpdateUserParams) error {
+	user := User{
+		ID: id,
+	}
+	cond := User{
+		Nickname: arg.Nickname,
+		Avatar:   arg.Avatar,
+		Email:    arg.Email,
+		Password: arg.Password,
+	}
+	fmt.Printf("更新条件 %v", cond)
+
+	exitUserArg := ExistUserParams{ID: id}
+	exist, err := q.ExistUser(exitUserArg)
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		return ErrUserNotFound
+	}
+
+	err = q.db.Model(&user).Updates(cond).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (q *Queries) DeleteUserByID(id int64) error {
+	exitUserArg := ExistUserParams{ID: id}
+	exist, err := q.ExistUser(exitUserArg)
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return ErrUserNotFound
+	}
+
+	now := time.Now()
+	cond := User{ID: id, DeletedAt: &now}
+
+	err = q.db.Model(&User{}).Updates(cond).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
