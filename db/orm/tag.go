@@ -13,15 +13,17 @@ var (
 )
 
 type ExistTagParams struct {
-	ID   int64
-	Name string
+	ID          int64
+	Name        string
+	FriendlyURL string
 }
 
 func (q *Queries) ExistTag(arg ExistTagParams) (bool, error) {
 	var tag Tag
 	cond := Tag{
-		ID:   arg.ID,
-		Name: arg.Name,
+		ID:          arg.ID,
+		Name:        arg.Name,
+		FriendlyURL: arg.FriendlyURL,
 	}
 
 	err := q.db.Scopes(isDeleted).First(&tag, cond).Error

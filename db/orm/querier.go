@@ -12,6 +12,12 @@ type Querier interface {
 	GetTagByID(id int64) (Tag, error)
 	UpdateTag(id int64, arg UpdateTagParams) error
 	DeleteTagByID(id int64) error
+
+	ListArticles(arg ListArticlesParams) ([]Article, int64, error)
+	CreateArticle(arg CreateArticleParams) (Article, error)
+	GetArticleByID(id int64) (Article, error)
+	UpdateArticle(id int64, arg UpdateArticleParams) error
+	DeleteArticleByID(id int64) error
 }
 
 var _ Querier = (*Queries)(nil)

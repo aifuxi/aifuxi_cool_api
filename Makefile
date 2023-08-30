@@ -23,8 +23,18 @@ db_drop:
 migrate_new:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
+# 应用所有的 migration
 migrate_up:
 	migrate -path db/migration -database "$(DB_URL)" -verbose up
 
+# 撤销所有的 migration
 migrate_down:
 	migrate -path db/migration -database "$(DB_URL)" -verbose down
+	
+# migrate up 1次
+migrate_up1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose up 1
+
+# migrate down 1次
+migrate_down1:
+	migrate -path db/migration -database "$(DB_URL)" -verbose down 1
