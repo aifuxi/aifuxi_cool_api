@@ -36,6 +36,13 @@ func (s *Server) setupRouter() {
 		adminAuthApi.PUT("/users/:id", s.UpdateUser)
 		adminAuthApi.DELETE("/users/:id", s.DeleteUser)
 	}
+	{
+		adminAuthApi.GET("/tags", s.ListTags)
+		adminAuthApi.POST("/tags", s.CreateTag)
+		adminAuthApi.GET("/tags/:id", s.GetTag)
+		adminAuthApi.PUT("/tags/:id", s.UpdateTag)
+		adminAuthApi.DELETE("/tags/:id", s.DeleteTag)
+	}
 
 	s.router = router
 }
