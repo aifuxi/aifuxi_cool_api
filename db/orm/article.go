@@ -1,6 +1,7 @@
 package db
 
 import (
+	"api.aifuxi.cool/util"
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
@@ -75,6 +76,26 @@ func (q *Queries) ListArticles(arg ListArticlesParams) ([]Article, int64, error)
 		return nil, count, err
 	}
 
+	for i, article := range articles {
+		var tagIDs []int64
+		var tags []Tag
+		tagIDs, err = q.GetArticleTagIDs(article.ID)
+		if err != nil {
+			err = fmt.Errorf("get article_tag ids error %d: %w", i, err)
+		}
+
+		tags, err = q.GetTagsByIDs(tagIDs)
+		if err != nil {
+			err = fmt.Errorf("get tags by ids error %d: %w", i, err)
+		}
+
+		if err != nil {
+			continue
+		}
+
+		articles[i].Tags = tags
+	}
+
 	return articles, count, nil
 }
 
@@ -87,6 +108,7 @@ type CreateArticleParams struct {
 	IsTop       bool
 	TopPriority int
 	IsPublished bool
+	TagIDs      []int64
 }
 
 func (q *Queries) CreateArticle(arg CreateArticleParams) (Article, error) {
@@ -116,11 +138,26 @@ func (q *Queries) CreateArticle(arg CreateArticleParams) (Article, error) {
 		return Article{}, err
 	}
 
+	err = q.BatchCreateArticleTag(article.ID, arg.TagIDs)
+	if err != nil {
+		return article, err
+	}
+
+	var tags []Tag
+	tags, err = q.GetTagsByIDs(arg.TagIDs)
+	if err != nil {
+		return article, err
+	}
+
+	article.Tags = tags
+
 	return article, nil
 }
 
 func (q *Queries) GetArticleByID(id int64) (Article, error) {
 	var article Article
+	var tagIDs []int64
+	var tags []Tag
 
 	err := q.db.Scopes(isDeleted).First(&article, id).Error
 	if err != nil {
@@ -130,6 +167,18 @@ func (q *Queries) GetArticleByID(id int64) (Article, error) {
 
 		return Article{}, err
 	}
+
+	tagIDs, err = q.GetArticleTagIDs(article.ID)
+	if err != nil {
+		return article, err
+	}
+
+	tags, err = q.GetTagsByIDs(tagIDs)
+	if err != nil {
+		return article, err
+	}
+
+	article.Tags = tags
 
 	return article, nil
 }
@@ -143,6 +192,7 @@ type UpdateArticleParams struct {
 	IsTop       bool
 	TopPriority int
 	IsPublished bool
+	TagIDs      []int64
 }
 
 func (q *Queries) UpdateArticle(id int64, arg UpdateArticleParams) error {
@@ -175,6 +225,41 @@ func (q *Queries) UpdateArticle(id int64, arg UpdateArticleParams) error {
 		return err
 	}
 
+	// 先找出文章下所有的tag id
+	var articleTagIDs []int64
+	articleTagIDs, err = q.GetArticleTagIDs(article.ID)
+	if err != nil {
+		return err
+	}
+
+	var tagErr error
+	// 判断有没有取消关联tag
+	for i, v := range articleTagIDs {
+		// [1,2,3]  [3]
+		if !util.FindInt64(arg.TagIDs, v) {
+			err := q.DeleteArticleTag(id, v)
+			if err != nil {
+				tagErr = fmt.Errorf("delete article tag error %d: %w", i, err)
+				continue
+			}
+		}
+	}
+
+	// 判断有没有新关联tag
+	for i, v := range arg.TagIDs {
+		if !util.FindInt64(articleTagIDs, v) {
+			err := q.CreateArticleTag(id, v)
+			if err != nil {
+				tagErr = fmt.Errorf("delete article tag error %d: %w", i, err)
+				continue
+			}
+		}
+	}
+
+	if tagErr != nil {
+		return tagErr
+	}
+
 	return nil
 }
 
@@ -195,6 +280,11 @@ func (q *Queries) DeleteArticleByID(id int64) error {
 	cond := Article{DeletedAt: &now}
 
 	err = q.db.Scopes(isDeleted).Model(&article).Updates(cond).Error
+	if err != nil {
+		return err
+	}
+
+	err = q.DeleteArticleTagByArticleID(article.ID)
 	if err != nil {
 		return err
 	}

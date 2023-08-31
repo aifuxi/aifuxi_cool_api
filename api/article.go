@@ -44,14 +44,15 @@ func (s *Server) ListArticles(c *gin.Context) {
 }
 
 type createArticleRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description" binding:"required"`
-	Cover       string `json:"cover"`
-	Content     string `json:"content" binding:"required"`
-	FriendlyURL string `json:"friendly_url" binding:"required"`
-	IsTop       bool   `json:"is_top"`
-	TopPriority int    `json:"top_priority"`
-	IsPublished bool   `json:"is_published"`
+	Title       string   `json:"title" binding:"required"`
+	Description string   `json:"description" binding:"required"`
+	Cover       string   `json:"cover"`
+	Content     string   `json:"content" binding:"required"`
+	FriendlyURL string   `json:"friendly_url" binding:"required"`
+	IsTop       bool     `json:"is_top"`
+	TopPriority int      `json:"top_priority"`
+	IsPublished bool     `json:"is_published"`
+	TagIDs      []string `json:"tag_ids"`
 }
 
 func (s *Server) CreateArticle(c *gin.Context) {
@@ -60,6 +61,19 @@ func (s *Server) CreateArticle(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		responseFailWithErr(c, ResponseCodeBadRequest, err)
 		return
+	}
+
+	var tagIDs []int64
+	if len(req.TagIDs) > 0 {
+		for _, v := range req.TagIDs {
+			tagID, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				responseFailWithErr(c, ResponseCodeBadRequest, err)
+				return
+			}
+
+			tagIDs = append(tagIDs, tagID)
+		}
 	}
 
 	arg := db.CreateArticleParams{
@@ -73,7 +87,11 @@ func (s *Server) CreateArticle(c *gin.Context) {
 		IsPublished: req.IsPublished,
 	}
 
-	user, err := s.store.CreateArticle(arg)
+	if len(tagIDs) > 0 {
+		arg.TagIDs = tagIDs
+	}
+
+	article, err := s.store.CreateArticle(arg)
 	if err != nil {
 		if errors.Is(err, db.ErrArticleExist) {
 			responseFailWithErr(c, ResponseCodeBadRequest, err)
@@ -84,7 +102,7 @@ func (s *Server) CreateArticle(c *gin.Context) {
 		return
 	}
 
-	responseOk(c, user)
+	responseOk(c, article)
 }
 
 func (s *Server) GetArticle(c *gin.Context) {
@@ -95,8 +113,8 @@ func (s *Server) GetArticle(c *gin.Context) {
 		return
 	}
 
-	var user db.Article
-	user, err = s.store.GetArticleByID(id)
+	var article db.Article
+	article, err = s.store.GetArticleByID(id)
 	if err != nil {
 		if errors.Is(err, db.ErrArticleNotFound) {
 			responseFailWithErr(c, ResponseCodeBadRequest, err)
@@ -106,18 +124,19 @@ func (s *Server) GetArticle(c *gin.Context) {
 		return
 	}
 
-	responseOk(c, user)
+	responseOk(c, article)
 }
 
 type updateArticleRequest struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Cover       string `json:"cover"`
-	Content     string `json:"content"`
-	FriendlyURL string `json:"friendly_url"`
-	IsTop       bool   `json:"is_top"`
-	TopPriority int    `json:"top_priority"`
-	IsPublished bool   `json:"is_published"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Cover       string   `json:"cover"`
+	Content     string   `json:"content"`
+	FriendlyURL string   `json:"friendly_url"`
+	IsTop       bool     `json:"is_top"`
+	TopPriority int      `json:"top_priority"`
+	IsPublished bool     `json:"is_published"`
+	TagIDs      []string `json:"tag_ids"`
 }
 
 func (s *Server) UpdateArticle(c *gin.Context) {
@@ -134,6 +153,19 @@ func (s *Server) UpdateArticle(c *gin.Context) {
 		return
 	}
 
+	var tagIDs []int64
+	if len(req.TagIDs) > 0 {
+		for _, v := range req.TagIDs {
+			tagID, err := strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				responseFailWithErr(c, ResponseCodeBadRequest, err)
+				return
+			}
+
+			tagIDs = append(tagIDs, tagID)
+		}
+	}
+
 	arg := db.UpdateArticleParams{
 		Title:       req.Title,
 		Description: req.Description,
@@ -143,6 +175,10 @@ func (s *Server) UpdateArticle(c *gin.Context) {
 		IsTop:       req.IsTop,
 		TopPriority: req.TopPriority,
 		IsPublished: req.IsPublished,
+	}
+
+	if len(tagIDs) > 0 {
+		arg.TagIDs = tagIDs
 	}
 
 	err = s.store.UpdateArticle(id, arg)

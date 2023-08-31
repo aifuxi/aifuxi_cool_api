@@ -54,7 +54,7 @@ type ListTagsParams struct {
 }
 
 func (q *Queries) ListTags(arg ListTagsParams) ([]Tag, int64, error) {
-	var Tags []Tag
+	var tags []Tag
 	var count int64
 
 	queryDB := q.db.Model(Tag{}).Scopes(isDeleted)
@@ -70,12 +70,21 @@ func (q *Queries) ListTags(arg ListTagsParams) ([]Tag, int64, error) {
 	queryDB = queryDB.Count(&count)
 
 	order := fmt.Sprintf("%s %s", arg.OrderBy, arg.Order)
-	err := queryDB.Order(order).Scopes(paginate(arg.Page, arg.PageSize)).Find(&Tags).Error
+	err := queryDB.Order(order).Scopes(paginate(arg.Page, arg.PageSize)).Find(&tags).Error
 	if err != nil {
 		return nil, count, err
 	}
 
-	return Tags, count, nil
+	for i, v := range tags {
+		articleIDs, err := q.GetArticleIDsByTagID(v.ID)
+		if err != nil {
+			continue
+		}
+
+		tags[i].ArticleCount = len(articleIDs)
+	}
+
+	return tags, count, nil
 }
 
 type CreateTagParams struct {
@@ -119,7 +128,25 @@ func (q *Queries) GetTagByID(id int64) (Tag, error) {
 		return Tag{}, err
 	}
 
+	articleIDs, err := q.GetArticleIDsByTagID(tag.ID)
+	if err != nil {
+		return tag, nil
+	}
+
+	tag.ArticleCount = len(articleIDs)
+
 	return tag, nil
+}
+
+func (q *Queries) GetTagsByIDs(ids []int64) ([]Tag, error) {
+	var tags []Tag
+
+	err := q.db.Scopes(isDeleted).Find(&tags, ids).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
 }
 
 type UpdateTagParams struct {

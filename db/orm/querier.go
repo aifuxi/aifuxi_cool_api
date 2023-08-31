@@ -18,6 +18,11 @@ type Querier interface {
 	GetArticleByID(id int64) (Article, error)
 	UpdateArticle(id int64, arg UpdateArticleParams) error
 	DeleteArticleByID(id int64) error
+
+	CreateArticleTag(articleID int64, tagID int64) error
+	BatchCreateArticleTag(articleID int64, tagIDs []int64) error
+	DeleteArticleTag(articleID int64, tagID int64) error
+	DeleteArticleTagByArticleID(articleID int64) error
 }
 
 var _ Querier = (*Queries)(nil)
