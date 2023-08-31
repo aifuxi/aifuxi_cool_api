@@ -55,8 +55,13 @@ func (s *Server) SignIn(c *gin.Context) {
 	}
 
 	user, err := s.store.GetUserByEmail(req.Email)
-	if errors.Is(err, db.ErrUserExist) {
-		responseFailWithErr(c, ResponseCodeInvalidEmailOrPassword, err)
+	if err != nil {
+		if errors.Is(err, db.ErrUserNotFound) {
+			responseFail(c, ResponseCodeInvalidEmailOrPassword)
+			return
+		}
+
+		responseFailWithErr(c, ResponseCodeFail, err)
 		return
 	}
 

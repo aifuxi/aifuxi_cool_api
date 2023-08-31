@@ -3,6 +3,7 @@ package api
 import (
 	db "api.aifuxi.cool/db/orm"
 	"github.com/gin-gonic/gin"
+	"path/filepath"
 )
 
 type Server struct {
@@ -27,6 +28,10 @@ func NewServer() (*Server, error) {
 
 func (s *Server) setupRouter() {
 	router := gin.Default()
+
+	rootPath := filepath.Join("uploads")
+	router.Static("/uploads", rootPath)
+
 	adminPublicApi := router.Group("/admin-api/public")
 	{
 		adminPublicApi.POST("/sign-in", s.SignIn)
@@ -34,6 +39,9 @@ func (s *Server) setupRouter() {
 
 	adminAuthApi := router.Group("/admin-api/auth")
 	adminAuthApi.Use(JwtAuth())
+	{
+		adminAuthApi.POST("/uploads", s.UploadFile)
+	}
 	{
 		adminAuthApi.GET("/users", s.ListUsers)
 		adminAuthApi.POST("/users", s.CreateUser)
@@ -55,6 +63,11 @@ func (s *Server) setupRouter() {
 		adminAuthApi.PUT("/articles/:id", s.UpdateArticle)
 		adminAuthApi.DELETE("/articles/:id", s.DeleteArticle)
 	}
+
+	// 兜底路由
+	router.NoRoute(func(c *gin.Context) {
+		responseFail(c, ResponseCodeNotFound)
+	})
 
 	s.router = router
 }

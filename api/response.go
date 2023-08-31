@@ -19,24 +19,28 @@ type TotalResponse struct {
 }
 
 const (
-	ResponseCodeOk   responseCode = 0
-	ResponseCodeFail responseCode = -1
+	ResponseCodeOk       responseCode = 0
+	ResponseCodeFail     responseCode = -1
+	ResponseCodeNotFound responseCode = 404
 
-	ResponseCodeBadRequest             = 1001
-	ResponseCodeNoAuthorized           = 1002
-	ResponseCodeInvalidToken           = 1003
-	ResponseCodeTokenExpired           = 1004
-	ResponseCodeInvalidEmailOrPassword = 1005
+	ResponseCodeBadRequest             responseCode = 1001
+	ResponseCodeNoAuthorized           responseCode = 1002
+	ResponseCodeInvalidToken           responseCode = 1003
+	ResponseCodeTokenExpired           responseCode = 1004
+	ResponseCodeInvalidEmailOrPassword              = 1005
+	ResponseCodeUploadFileFailed                    = 1006
 )
 
 var responseMsgMap = map[responseCode]string{
 	ResponseCodeOk:                     "ok",
 	ResponseCodeFail:                   "服务器错误",
 	ResponseCodeBadRequest:             "请求参数错误，请检查",
+	ResponseCodeNotFound:               "404 not found",
 	ResponseCodeNoAuthorized:           "未登录",
 	ResponseCodeInvalidToken:           "token 错误",
 	ResponseCodeTokenExpired:           "token 已过期，请检查",
 	ResponseCodeInvalidEmailOrPassword: "邮箱或密码错误",
+	ResponseCodeUploadFileFailed:       "上传文件失败",
 }
 
 func (c responseCode) GetMsg() string {
