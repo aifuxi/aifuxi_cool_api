@@ -124,6 +124,21 @@ func (q *Queries) GetUserByID(id int64) (User, error) {
 	return user, nil
 }
 
+func (q *Queries) GetUserByEmail(email string) (User, error) {
+	var user User
+
+	err := q.db.Scopes(isDeleted).First(&user, User{Email: email}).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return User{}, ErrUserNotFound
+		}
+
+		return User{}, err
+	}
+
+	return user, nil
+}
+
 type UpdateUserParams struct {
 	Nickname string
 	Avatar   string

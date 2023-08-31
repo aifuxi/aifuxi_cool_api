@@ -27,8 +27,13 @@ func NewServer() (*Server, error) {
 
 func (s *Server) setupRouter() {
 	router := gin.Default()
+	adminPublicApi := router.Group("/admin-api/public")
+	{
+		adminPublicApi.POST("/sign-in", s.SignIn)
+	}
 
-	adminAuthApi := router.Group("/adminapi/auth")
+	adminAuthApi := router.Group("/admin-api/auth")
+	adminAuthApi.Use(JwtAuth())
 	{
 		adminAuthApi.GET("/users", s.ListUsers)
 		adminAuthApi.POST("/users", s.CreateUser)

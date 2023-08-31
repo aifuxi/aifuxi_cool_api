@@ -22,13 +22,21 @@ const (
 	ResponseCodeOk   responseCode = 0
 	ResponseCodeFail responseCode = -1
 
-	ResponseCodeBadRequest = 1001
+	ResponseCodeBadRequest             = 1001
+	ResponseCodeNoAuthorized           = 1002
+	ResponseCodeInvalidToken           = 1003
+	ResponseCodeTokenExpired           = 1004
+	ResponseCodeInvalidEmailOrPassword = 1005
 )
 
 var responseMsgMap = map[responseCode]string{
-	ResponseCodeOk:         "ok",
-	ResponseCodeFail:       "服务器错误",
-	ResponseCodeBadRequest: "请求参数错误，请检查",
+	ResponseCodeOk:                     "ok",
+	ResponseCodeFail:                   "服务器错误",
+	ResponseCodeBadRequest:             "请求参数错误，请检查",
+	ResponseCodeNoAuthorized:           "未登录",
+	ResponseCodeInvalidToken:           "token 错误",
+	ResponseCodeTokenExpired:           "token 已过期，请检查",
+	ResponseCodeInvalidEmailOrPassword: "邮箱或密码错误",
 }
 
 func (c responseCode) GetMsg() string {
