@@ -8,11 +8,7 @@ import (
 	"time"
 )
 
-const baseUploadDir = "uploads"
 const uploadField = "file"
-
-type uploadFileResponse struct {
-}
 
 func (s *Server) UploadFile(c *gin.Context) {
 	// 单文件

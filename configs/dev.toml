@@ -1,7 +1,7 @@
 [app]
 # 和 Gin 的 Mode对应: debug release test
 mode = "debug"
-port = 9003
+addr = "127.0.0.1:9003"
 jwt_secret = "aaxxbbcceee"
 jwt_expired_hour = 2
 

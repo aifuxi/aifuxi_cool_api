@@ -11,6 +11,8 @@ type Server struct {
 	store  db.Store
 }
 
+const baseUploadDir = "uploads"
+
 func NewServer() (*Server, error) {
 	store, err := db.NewStore()
 	if err != nil {
@@ -27,9 +29,10 @@ func NewServer() (*Server, error) {
 }
 
 func (s *Server) setupRouter() {
-	router := gin.Default()
+	router := gin.New()
+	router.Use(GinLogger(), GinRecovery(true))
 
-	rootPath := filepath.Join("uploads")
+	rootPath := filepath.Join(baseUploadDir)
 	router.Static("/uploads", rootPath)
 
 	adminPublicApi := router.Group("/admin-api/public")

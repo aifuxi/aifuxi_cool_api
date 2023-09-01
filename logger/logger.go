@@ -1,9 +1,9 @@
 package logger
 
 import (
+	"api.aifuxi.cool/settings"
 	"os"
 
-	"api.aifuxi.cool/settings"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"

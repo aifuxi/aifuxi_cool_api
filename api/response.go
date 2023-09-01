@@ -27,8 +27,8 @@ const (
 	ResponseCodeNoAuthorized           responseCode = 1002
 	ResponseCodeInvalidToken           responseCode = 1003
 	ResponseCodeTokenExpired           responseCode = 1004
-	ResponseCodeInvalidEmailOrPassword              = 1005
-	ResponseCodeUploadFileFailed                    = 1006
+	ResponseCodeInvalidEmailOrPassword responseCode = 1005
+	ResponseCodeUploadFileFailed       responseCode = 1006
 )
 
 var responseMsgMap = map[responseCode]string{

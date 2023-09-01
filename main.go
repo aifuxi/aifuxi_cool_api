@@ -2,7 +2,9 @@ package main
 
 import (
 	"api.aifuxi.cool/api"
+	"api.aifuxi.cool/logger"
 	"api.aifuxi.cool/settings"
+	"go.uber.org/zap"
 	"log"
 )
 
@@ -12,13 +14,15 @@ func main() {
 		log.Fatalln("init settings error: ", err)
 	}
 
+	logger.Init()
+
 	server, err := api.NewServer()
 	if err != nil {
-		log.Fatalln("new server error: ", err)
+		zap.L().Fatal("new server error: ", zap.Error(err))
 	}
 
-	err = server.Start("localhost:9003")
+	err = server.Start(settings.AppConfig.Addr)
 	if err != nil {
-		log.Fatalln("start server error: ", err)
+		zap.L().Fatal("start server error: ", zap.Error(err))
 	}
 }

@@ -6,7 +6,7 @@ import (
 
 type appSettings struct {
 	Mode           string `mapstructure:"mode"`
-	Port           int    `mapstructure:"port"`
+	Addr           string `mapstructure:"addr"`
 	JwtSecret      string `mapstructure:"jwt_secret"`
 	JwtExpiredHour int    `mapstructure:"jwt_expired_hour"`
 }

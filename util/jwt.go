@@ -1,10 +1,10 @@
 package util
 
 import (
+	"api.aifuxi.cool/settings"
+	"errors"
 	"time"
 
-	"api.aifuxi.cool/myerror"
-	"api.aifuxi.cool/settings"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -43,5 +43,5 @@ func ParseToken(tokenStr string) (*MyClaims, error) {
 		return claims, nil
 	}
 
-	return nil, myerror.ErrorParseTokenFailed
+	return nil, errors.New("failed to parse token")
 }
