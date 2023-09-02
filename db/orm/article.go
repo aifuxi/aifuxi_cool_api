@@ -84,6 +84,10 @@ func (q *Queries) ListArticles(arg ListArticlesParams) ([]Article, int64, error)
 			err = fmt.Errorf("get article_tag ids error %d: %w", i, err)
 		}
 
+		if len(tagIDs) == 0 {
+			continue
+		}
+
 		tags, err = q.GetTagsByIDs(tagIDs)
 		if err != nil {
 			err = fmt.Errorf("get tags by ids error %d: %w", i, err)
@@ -170,6 +174,10 @@ func (q *Queries) GetArticleByID(id int64) (Article, error) {
 
 	tagIDs, err = q.GetArticleTagIDs(article.ID)
 	if err != nil {
+		return article, err
+	}
+
+	if len(tagIDs) == 0 {
 		return article, err
 	}
 

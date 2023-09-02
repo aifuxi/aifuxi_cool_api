@@ -202,5 +202,10 @@ func (q *Queries) DeleteTagByID(id int64) error {
 		return err
 	}
 
+	err = q.DeleteArticleTagByTagID(id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

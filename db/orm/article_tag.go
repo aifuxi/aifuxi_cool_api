@@ -14,6 +14,10 @@ func (q *Queries) CreateArticleTag(articleID int64, tagID int64) error {
 }
 
 func (q *Queries) BatchCreateArticleTag(articleID int64, tagIDs []int64) error {
+	if len(tagIDs) == 0 {
+		return nil
+	}
+
 	var articleTagList []ArticleTag
 	for _, tagID := range tagIDs {
 		articleTagList = append(articleTagList, ArticleTag{
@@ -45,6 +49,17 @@ func (q *Queries) DeleteArticleTag(articleID int64, tagID int64) error {
 func (q *Queries) DeleteArticleTagByArticleID(articleID int64) error {
 	err := q.db.Delete(ArticleTag{}, ArticleTag{
 		ArticleID: articleID,
+	}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (q *Queries) DeleteArticleTagByTagID(tagID int64) error {
+	err := q.db.Delete(ArticleTag{}, ArticleTag{
+		TagID: tagID,
 	}).Error
 	if err != nil {
 		return err
