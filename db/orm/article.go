@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -27,7 +26,7 @@ func (q *Queries) ExistArticle(arg ExistArticleParams) (bool, error) {
 		FriendlyURL: arg.FriendlyURL,
 	}
 
-	err := q.db.Scopes(isDeleted).First(&article, cond).Error
+	err := q.db.First(&article, cond).Error
 	if err != nil {
 		// 如果 err 是 ErrRecordNotFound，只是记录没找到，不认为是出错了
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -58,7 +57,7 @@ func (q *Queries) ListArticles(arg ListArticlesParams) ([]Article, int64, error)
 	var articles []Article
 	var count int64
 
-	queryDB := q.db.Model(Article{}).Scopes(isDeleted)
+	queryDB := q.db.Model(Article{})
 
 	if len(arg.FriendlyURL) > 0 {
 		queryDB.Where("friendly_url LIKE ?", "%"+arg.FriendlyURL+"%")
@@ -137,7 +136,7 @@ func (q *Queries) CreateArticle(arg CreateArticleParams) (Article, error) {
 		return Article{}, ErrArticleExist
 	}
 
-	err = q.db.Scopes(isDeleted).Create(&article).Error
+	err = q.db.Create(&article).Error
 	if err != nil {
 		return Article{}, err
 	}
@@ -163,7 +162,7 @@ func (q *Queries) GetArticleByID(id int64) (Article, error) {
 	var tagIDs []int64
 	var tags []Tag
 
-	err := q.db.Scopes(isDeleted).First(&article, id).Error
+	err := q.db.First(&article, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return Article{}, ErrArticleNotFound
@@ -228,7 +227,7 @@ func (q *Queries) UpdateArticle(id int64, arg UpdateArticleParams) error {
 		return ErrArticleNotFound
 	}
 
-	err = q.db.Scopes(isDeleted).Model(&article).Updates(cond).Error
+	err = q.db.Model(&article).Updates(cond).Error
 	if err != nil {
 		return err
 	}
@@ -281,18 +280,12 @@ func (q *Queries) DeleteArticleByID(id int64) error {
 		return ErrArticleNotFound
 	}
 
-	now := time.Now()
-	article := Article{
-		ID: id,
-	}
-	cond := Article{DeletedAt: &now}
-
-	err = q.db.Scopes(isDeleted).Model(&article).Updates(cond).Error
+	err = q.db.Delete(&Article{}, id).Error
 	if err != nil {
 		return err
 	}
 
-	err = q.DeleteArticleTagByArticleID(article.ID)
+	err = q.DeleteArticleTagByArticleID(id)
 	if err != nil {
 		return err
 	}

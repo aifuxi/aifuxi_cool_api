@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -24,7 +23,7 @@ func (q *Queries) ExistUser(arg ExistUserParams) (bool, error) {
 		Email: arg.Email,
 	}
 
-	err := q.db.Scopes(isDeleted).First(&user, cond).Error
+	err := q.db.First(&user, cond).Error
 	if err != nil {
 		// 如果 err 是 ErrRecordNotFound，只是记录没找到，不认为是出错了
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -55,7 +54,7 @@ func (q *Queries) ListUsers(arg ListUsersParams) ([]User, int64, error) {
 	var users []User
 	var count int64
 
-	queryDB := q.db.Model(User{}).Scopes(isDeleted)
+	queryDB := q.db.Model(User{})
 
 	if len(arg.Nickname) > 0 {
 		queryDB.Where("nickname LIKE ?", "%"+arg.Nickname+"%")
@@ -112,7 +111,7 @@ func (q *Queries) CreateUser(arg CreateUserParams) (User, error) {
 func (q *Queries) GetUserByID(id int64) (User, error) {
 	var user User
 
-	err := q.db.Scopes(isDeleted).First(&user, id).Error
+	err := q.db.First(&user, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, ErrUserNotFound
@@ -127,7 +126,7 @@ func (q *Queries) GetUserByID(id int64) (User, error) {
 func (q *Queries) GetUserByEmail(email string) (User, error) {
 	var user User
 
-	err := q.db.Scopes(isDeleted).First(&user, User{Email: email}).Error
+	err := q.db.First(&user, User{Email: email}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return User{}, ErrUserNotFound
@@ -168,7 +167,7 @@ func (q *Queries) UpdateUser(id int64, arg UpdateUserParams) error {
 		return ErrUserNotFound
 	}
 
-	err = q.db.Scopes(isDeleted).Model(&user).Updates(cond).Error
+	err = q.db.Model(&user).Updates(cond).Error
 	if err != nil {
 		return err
 	}
@@ -186,13 +185,7 @@ func (q *Queries) DeleteUserByID(id int64) error {
 		return ErrUserNotFound
 	}
 
-	now := time.Now()
-	user := User{
-		ID: id,
-	}
-	cond := User{DeletedAt: &now}
-
-	err = q.db.Scopes(isDeleted).Model(&user).Updates(cond).Error
+	err = q.db.Delete(&User{}, id).Error
 	if err != nil {
 		return err
 	}

@@ -2,10 +2,6 @@ package db
 
 import "gorm.io/gorm"
 
-func isDeleted(db *gorm.DB) *gorm.DB {
-	return db.Where("deleted_at is null")
-}
-
 func paginate(page int, pageSize int) func(db *gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
 

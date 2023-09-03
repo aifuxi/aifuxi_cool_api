@@ -8,10 +8,9 @@ CREATE TABLE
 					 `password` varchar(255) NOT NULL COMMENT '加密后的用户密码',
 					 `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					 `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-					 `deleted_at` datetime,
+					 
 					 PRIMARY KEY (`id`),
-					 UNIQUE KEY `idx_email` (`email`),
-					 INDEX `idx_deleted_at` (`deleted_at`)
+					 UNIQUE KEY `idx_email` (`email`)		 
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '用户表';
 
 
@@ -23,11 +22,10 @@ CREATE TABLE
 					`friendly_url` varchar(255) NOT NULL COMMENT '标签的friendly_url，SEO用',
 					`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-					`deleted_at` datetime,
+					
 					PRIMARY KEY (`id`),
 					UNIQUE KEY `idx_name` (`name`),
-					UNIQUE KEY `idx_friendly_url` (`friendly_url`),
-					INDEX `idx_deleted_at` (`deleted_at`)
+					UNIQUE KEY `idx_friendly_url` (`friendly_url`)					
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '标签表';
 
 
@@ -42,13 +40,13 @@ CREATE TABLE
 							`friendly_url` varchar(255) NOT NULL COMMENT '文章的friendly_url，SEO用',
 							`is_top` boolean NOT NULL DEFAULT FALSE COMMENT '文章是否置顶',
 							`top_priority` tinyint(10) NOT NULL DEFAULT 0 COMMENT '文章置顶优先级',
+							`is_published` boolean NOT NULL DEFAULT FALSE COMMENT '文章是否发布',
 							`created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 							`updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-							`deleted_at` datetime,
+							  
 							PRIMARY KEY (`id`),
 							UNIQUE KEY `idx_title` (`title`),
-							UNIQUE KEY `idx_friendly_url` (`friendly_url`),
-							INDEX `idx_deleted_at` (`deleted_at`)
+							UNIQUE KEY `idx_friendly_url` (`friendly_url`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '文章表';
 
 

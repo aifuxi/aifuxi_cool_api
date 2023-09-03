@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -26,7 +25,7 @@ func (q *Queries) ExistTag(arg ExistTagParams) (bool, error) {
 		FriendlyURL: arg.FriendlyURL,
 	}
 
-	err := q.db.Scopes(isDeleted).First(&tag, cond).Error
+	err := q.db.First(&tag, cond).Error
 	if err != nil {
 		// 如果 err 是 ErrRecordNotFound，只是记录没找到，不认为是出错了
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -57,7 +56,7 @@ func (q *Queries) ListTags(arg ListTagsParams) ([]Tag, int64, error) {
 	var tags []Tag
 	var count int64
 
-	queryDB := q.db.Model(Tag{}).Scopes(isDeleted)
+	queryDB := q.db.Model(Tag{})
 
 	if len(arg.FriendlyURL) > 0 {
 		queryDB.Where("friendly_url LIKE ?", "%"+arg.FriendlyURL+"%")
@@ -108,7 +107,7 @@ func (q *Queries) CreateTag(arg CreateTagParams) (Tag, error) {
 		return Tag{}, ErrTagExist
 	}
 
-	err = q.db.Scopes(isDeleted).Create(&tag).Error
+	err = q.db.Create(&tag).Error
 	if err != nil {
 		return Tag{}, err
 	}
@@ -119,7 +118,7 @@ func (q *Queries) CreateTag(arg CreateTagParams) (Tag, error) {
 func (q *Queries) GetTagByID(id int64) (Tag, error) {
 	var tag Tag
 
-	err := q.db.Scopes(isDeleted).First(&tag, id).Error
+	err := q.db.First(&tag, id).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return Tag{}, ErrTagNotFound
@@ -141,7 +140,7 @@ func (q *Queries) GetTagByID(id int64) (Tag, error) {
 func (q *Queries) GetTagsByIDs(ids []int64) ([]Tag, error) {
 	var tags []Tag
 
-	err := q.db.Scopes(isDeleted).Find(&tags, ids).Error
+	err := q.db.Find(&tags, ids).Error
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +172,7 @@ func (q *Queries) UpdateTag(id int64, arg UpdateTagParams) error {
 		return ErrTagNotFound
 	}
 
-	err = q.db.Scopes(isDeleted).Model(&tag).Updates(cond).Error
+	err = q.db.Model(&tag).Updates(cond).Error
 	if err != nil {
 		return err
 	}
@@ -191,13 +190,7 @@ func (q *Queries) DeleteTagByID(id int64) error {
 		return ErrTagNotFound
 	}
 
-	now := time.Now()
-	tag := Tag{
-		ID: id,
-	}
-	cond := Tag{DeletedAt: &now}
-
-	err = q.db.Scopes(isDeleted).Model(&tag).Updates(cond).Error
+	err = q.db.Delete(&Tag{}, id).Error
 	if err != nil {
 		return err
 	}

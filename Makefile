@@ -9,7 +9,7 @@ run:
 
 # 用 Docker 启动一个 MySQL 服务
 db_run:
-	docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -v mysql_test:/var/lib/mysql -d mysql:8
+	docker run --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 -v docker-mysql:/var/lib/mysql -d mysql:8
 
 # 创建数据库
 db_create:
