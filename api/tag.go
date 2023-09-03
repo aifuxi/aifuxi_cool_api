@@ -12,7 +12,7 @@ type listTagsRequest struct {
 	FriendlyURL string `form:"friendly_url"`
 
 	Page     int    `form:"page" binding:"required,gte=1"`
-	PageSize int    `form:"page_size" binding:"required,gte=10,lte=100"`
+	PageSize int    `form:"page_size" binding:"required,gte=10,lte=500"`
 	Order    string `form:"order" binding:"required,oneof=asc desc"`
 	OrderBy  string `form:"order_by" binding:"required,oneof=created_at updated_at"`
 }

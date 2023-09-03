@@ -64,7 +64,7 @@ func (q *Queries) ListTags(arg ListTagsParams) ([]Tag, int64, error) {
 	}
 
 	if len(arg.Name) > 0 {
-		queryDB.Where("email LIKE ?", "%"+arg.Name+"%")
+		queryDB.Where("name LIKE ?", "%"+arg.Name+"%")
 	}
 
 	queryDB = queryDB.Count(&count)
