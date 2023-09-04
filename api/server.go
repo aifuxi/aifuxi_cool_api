@@ -67,6 +67,12 @@ func (s *Server) setupRouter() {
 		adminAuthApi.DELETE("/articles/:id", s.DeleteArticle)
 	}
 
+	webSiteApi := router.Group("/api")
+	{
+		webSiteApi.GET("/tags", s.ListTags)
+		webSiteApi.GET("/articles", s.ListArticles)
+	}
+
 	// 兜底路由
 	router.NoRoute(func(c *gin.Context) {
 		responseFail(c, ResponseCodeNotFound)
